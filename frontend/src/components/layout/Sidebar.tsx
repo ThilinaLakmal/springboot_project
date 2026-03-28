@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown } from 'lucide-react';
+import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown, LayoutList } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
@@ -9,6 +9,7 @@ export const Sidebar: React.FC = () => {
 
   const navItems = [
     { label: 'Dashboard', path: '/app/facilities/dashboard', icon: LayoutDashboard },
+    { label: 'Campus Feed', path: '/app/facilities/feed', icon: LayoutList },
     { label: 'Resource List', path: '/app/facilities/resources', icon: Box, exact: true },
     { label: 'My Bookings', path: '/app/facilities/bookings/my', icon: Box },
     { label: 'Add Resource', path: '/app/facilities/resources/add', icon: PlusCircle },

@@ -10,6 +10,7 @@ import { Login } from './pages/Login';
 // Actual facilities pages imports
 import { Dashboard } from './pages/facilities/Dashboard';
 import { ResourceList } from './pages/facilities/ResourceList';
+import { ResourceFeed } from './pages/facilities/ResourceFeed';
 import { AddResource } from './pages/facilities/AddResource';
 import { EditResource } from './pages/facilities/EditResource';
 import { ManageResources } from './pages/facilities/ManageResources';
@@ -30,6 +31,7 @@ const App: React.FC = () => {
         <Routes>
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
+          <Route path="/feed" element={<ResourceFeed />} />
 
           {/* Protected Application Routes */}
           <Route element={<ProtectedRoute />}>
@@ -40,6 +42,7 @@ const App: React.FC = () => {
 
               {/* Facilities & Assets Module Routes */}
               <Route path="facilities/dashboard" element={<Dashboard />} />
+              <Route path="facilities/feed" element={<Navigate to="/feed" replace />} />
               <Route path="facilities/resources" element={<ResourceList />} />
               <Route path="facilities/resources/add" element={<AddResource />} />
               <Route path="facilities/resources/manage" element={<ProtectedRoute requiredRole="ADMIN" />} >
