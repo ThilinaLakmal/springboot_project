@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Restore session from localStorage safely
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    
+
     if (storedUser && storedToken) {
       setUser(JSON.parse(storedUser));
     }
@@ -45,11 +45,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        login, 
-        logout, 
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
         isAuthenticated: !!user,
         isAdmin: user?.role === 'ADMIN'
       }}

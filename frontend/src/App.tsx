@@ -34,24 +34,24 @@ const App: React.FC = () => {
           {/* Protected Application Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/app" element={<MainLayout />}>
-              
+
               {/* Redirect /app to dashboard */}
               <Route index element={<Navigate to="/app/facilities/dashboard" replace />} />
-              
+
               {/* Facilities & Assets Module Routes */}
               <Route path="facilities/dashboard" element={<Dashboard />} />
               <Route path="facilities/resources" element={<ResourceList />} />
               <Route path="facilities/resources/add" element={<AddResource />} />
               <Route path="facilities/resources/manage" element={<ProtectedRoute requiredRole="ADMIN" />} >
-                 <Route index element={<ManageResources />} />
-                 <Route path="edit/:id" element={<EditResource />} />
+                <Route index element={<ManageResources />} />
+                <Route path="edit/:id" element={<EditResource />} />
               </Route>
               <Route path="facilities/resources/:id" element={<ResourceDetails />} />
               <Route path="facilities/bookings/my" element={<MyBookings />} />
               <Route path="facilities/bookings/manage" element={<ProtectedRoute requiredRole="ADMIN" />}>
-                 <Route index element={<ManageBookings />} />
+                <Route index element={<ManageBookings />} />
               </Route>
-              
+
               {/* Other modules placeholders */}
             </Route>
           </Route>

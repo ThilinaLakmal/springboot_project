@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getResources } from '../../api/resourceApi';
+import { getResources, deleteResource } from '../../api/resourceApi';
 import { Resource } from '../../types/resource';
-import { Search, Filter, Box, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Filter, Box, ChevronLeft, ChevronRight, Edit2, Trash2, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
 export const ResourceList: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Pagination & Filtering
   const [page, setPage] = useState(0);
   const [size] = useState(12);
@@ -38,6 +38,20 @@ export const ResourceList: React.FC = () => {
     }
   };
 
+  const handleDelete = async (id: number | string) => {
+    if (window.confirm('Are you sure you want to delete this resource?')) {
+      try {
+        setLoading(true);
+        await deleteResource(id);
+        toast.success('Resource deleted successfully.');
+        fetchResources(); // Refresh the list
+      } catch (err) {
+        toast.error('Failed to delete resource.');
+        setLoading(false);
+      }
+    }
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -47,12 +61,12 @@ export const ResourceList: React.FC = () => {
         </div>
         <div className="flex gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
-             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-             <input type="text" placeholder="Search name or location..."
-                value={search}
-                onChange={e => {setSearch(e.target.value); setPage(0);}}
-                className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 transition-shadow outline-none" 
-             />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <input type="text" placeholder="Search name or location..."
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(0); }}
+              className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 transition-shadow outline-none"
+            />
           </div>
           <button onClick={() => setIsFilterOpen(!isFilterOpen)} className="flex items-center justify-center gap-2 border border-slate-300 bg-white text-slate-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-slate-50 shadow-sm transition-colors">
             <Filter size={16} /> Filters
@@ -63,12 +77,12 @@ export const ResourceList: React.FC = () => {
       {isFilterOpen && (
         <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-4 animate-fade-in">
           <label className="text-sm font-semibold text-slate-700">Filter by Type:</label>
-          <select value={type} onChange={e => {setType(e.target.value); setPage(0);}} className="px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none w-48 appearance-none cursor-pointer">
-             <option value="">All Types</option>
-             <option value="Hall">Lecture Halls</option>
-             <option value="Lab">Laboratories</option>
-             <option value="Library">Libraries</option>
-             <option value="Sports">Sports Arenas</option>
+          <select value={type} onChange={e => { setType(e.target.value); setPage(0); }} className="px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none w-48 appearance-none cursor-pointer">
+            <option value="">All Types</option>
+            <option value="Hall">Lecture Halls</option>
+            <option value="Lab">Laboratories</option>
+            <option value="Library">Libraries</option>
+            <option value="Sports">Sports Arenas</option>
           </select>
         </div>
       )}
@@ -88,21 +102,21 @@ export const ResourceList: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-slate-100 relative">
               {loading && (
-                 <tr><td colSpan={6} className="h-48 text-center text-slate-500"><div className="animate-spin inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2"></div><br/>Loading...</td></tr>
+                <tr><td colSpan={6} className="h-48 text-center text-slate-500"><div className="animate-spin inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2"></div><br />Loading...</td></tr>
               )}
               {!loading && resources.length === 0 && (
-                 <tr><td colSpan={6} className="py-12 text-center text-slate-500 font-medium tracking-wide">No resources found matching criteria.</td></tr>
+                <tr><td colSpan={6} className="py-12 text-center text-slate-500 font-medium tracking-wide">No resources found matching criteria.</td></tr>
               )}
               {!loading && resources.map(resource => (
                 <tr key={resource.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100/50 overflow-hidden">
-                         {resource.imageUrl ? (
-                           <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover" />
-                         ) : (
-                           <Box size={20} />
-                         )}
+                        {resource.imageUrl ? (
+                          <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <Box size={20} />
+                        )}
                       </div>
                       <span className="font-bold text-slate-800">{resource.name}</span>
                     </div>
@@ -111,40 +125,47 @@ export const ResourceList: React.FC = () => {
                   <td className="py-4 px-6 text-center text-slate-600">{resource.capacity}</td>
                   <td className="py-4 px-6 text-slate-500">{resource.location}</td>
                   <td className="py-4 px-6">
-                    <span className={`px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full border ${
-                      resource.status === 'ACTIVE' 
-                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200' 
+                    <span className={`px-3 py-1 text-[11px] uppercase tracking-wider font-bold rounded-full border ${resource.status === 'ACTIVE'
+                        ? 'bg-emerald-50 text-emerald-600 border-emerald-200'
                         : resource.status === 'MAINTENANCE'
-                        ? 'bg-amber-50 text-amber-600 border-amber-200'
-                        : 'bg-red-50 text-red-600 border-red-200'
-                    }`}>
+                          ? 'bg-amber-50 text-amber-600 border-amber-200'
+                          : 'bg-red-50 text-red-600 border-red-200'
+                      }`}>
                       {resource.status}
                     </span>
                   </td>
                   <td className="py-4 px-6 text-right">
-                    <Link to={`/app/facilities/resources/${resource.id}`} className="text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm">
-                      View Details
-                    </Link>
+                    <div className="flex items-center justify-end gap-2 text-sm w-full">
+                      <Link to={`/app/facilities/resources/${resource.id}`} title="View Details" className="p-2 px-3 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors font-bold flex items-center gap-2">
+                        <Eye size={16} /> <span className="hidden sm:inline">View</span>
+                      </Link>
+                      <Link to={`/app/facilities/resources/manage/edit/${resource.id}`} title="Edit Resource" className="p-2 px-3 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold flex items-center gap-2">
+                        <Edit2 size={16} /> <span className="hidden sm:inline">Edit</span>
+                      </Link>
+                      <button onClick={() => handleDelete(resource.id)} title="Delete Resource" className="p-2 px-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-bold flex items-center gap-2 shadow-sm active:scale-95">
+                        <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination Controls */}
         <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-sm text-slate-600">
-            <div>
-               Showing page <span className="font-bold">{page + 1}</span> of <span className="font-bold">{totalPages}</span>
-            </div>
-            <div className="flex gap-2">
-                <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
-                    <ChevronLeft size={18} />
-                </button>
-                <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
-                    <ChevronRight size={18} />
-                </button>
-            </div>
+          <div>
+            Showing page <span className="font-bold">{page + 1}</span> of <span className="font-bold">{totalPages}</span>
+          </div>
+          <div className="flex gap-2">
+            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
+              <ChevronLeft size={18} />
+            </button>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
+              <ChevronRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
