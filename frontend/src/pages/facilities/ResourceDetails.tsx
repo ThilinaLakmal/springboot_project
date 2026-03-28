@@ -43,93 +43,102 @@ export const ResourceDetails: React.FC = () => {
   if (!resource) return <div className="p-12 text-center text-red-500 font-bold">Resource not found.</div>;
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 animate-fade-in-up">
-       <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors mb-6">
+    <div className="max-w-6xl mx-auto p-4 md:p-8 animate-fade-in-up">
+       <button onClick={() => navigate(-1)} className="group flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors mb-6 bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200 w-max">
          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Back to Catalogue
        </button>
 
-       <div className="bg-white rounded-3xl shadow-md border border-slate-100 overflow-hidden">
-          {/* Header Banner Image */}
-          <div className="h-64 sm:h-80 md:h-96 w-full bg-slate-100 relative group border-b border-slate-100">
-             {resource.imageUrl ? (
-               <img src={`http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-             ) : (
-               <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
-                  <ImageIcon size={64} className="mb-4 opacity-50" />
-                  <span className="font-medium tracking-wide">No Media Available</span>
-               </div>
-             )}
-             <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent z-10"></div>
-             
-             <div className="absolute bottom-6 left-8 z-20">
-                <div className="bg-blue-600/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-xs font-bold tracking-widest uppercase mb-3 inline-block shadow-sm">
-                  {resource.type}
+       <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+          <div className="flex flex-col lg:flex-row">
+             {/* Left Column: Image & Actions */}
+             <div className="lg:w-2/5 p-6 lg:border-r border-slate-100 bg-slate-50/50 flex flex-col items-center justify-start">
+                <div className="w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 shadow-inner relative group border border-slate-200/60">
+                  {resource.imageUrl ? (
+                    <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
+                        <ImageIcon size={64} className="mb-4 opacity-30" />
+                        <span className="font-medium tracking-wide">No Media Available</span>
+                    </div>
+                  )}
+                  {/* Status Overlay */}
+                  <div className="absolute top-4 left-4">
+                     <span className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md backdrop-blur-md ${resource.status === 'ACTIVE'
+                        ? 'bg-emerald-500/90 text-white'
+                        : resource.status === 'MAINTENANCE'
+                          ? 'bg-amber-500/90 text-white'
+                          : 'bg-red-500/90 text-white'
+                      }`}>
+                      {resource.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">{resource.name}</h1>
+
+                <div className="w-full mt-6 space-y-4">
+                  <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p className="text-xs text-slate-500 font-bold mb-1 tracking-wider uppercase">Operational Status</p>
+                    <div className={`font-black tracking-wide text-lg flex items-center justify-center gap-2 ${resource.status === 'ACTIVE' ? 'text-emerald-600' : resource.status === 'MAINTENANCE' ? 'text-amber-600' : 'text-red-600'}`}>
+                      {resource.status === 'ACTIVE' ? <CheckCircle2 size={24} /> : null} 
+                      {resource.status.replace(/_/g, ' ')}
+                    </div>
+                  </div>
+
+                  {resource.status === 'ACTIVE' && (
+                     <button onClick={() => setShowModal(true)} className="w-full py-4 rounded-xl bg-blue-600 text-white font-bold tracking-wide hover:bg-blue-700 transition-all shadow-md flex justify-center items-center gap-2 hover:-translate-y-0.5 active:scale-95 border border-blue-500">
+                        <Calendar size={20} /> BOOK THIS RESOURCE
+                     </button>
+                  )}
+                </div>
              </div>
-          </div>
 
-          <div className="p-8 md:p-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
-             <div className="lg:col-span-2 space-y-8">
-               <section>
-                 <h3 className="text-xl font-bold text-slate-800 mb-4 border-b border-slate-100 pb-2">Description & Notes</h3>
-                 <p className="text-slate-600 leading-relaxed text-lg">
-                   {resource.description || `The ${resource.name} is a state-of-the-art facility located seamlessly within the ${resource.location}. Designed to support the academic and extracurricular needs of the SmartUniNexus structure, it ensures high reliability and comfort for up to ${resource.capacity} occupants.`}
-                 </p>
-               </section>
-             </div>
+             {/* Right Column: Details & Specs */}
+             <div className="lg:w-3/5 p-8 md:p-10 lg:p-12 flex flex-col">
+                <div className="mb-8">
+                   <div className="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-md text-xs font-bold tracking-widest uppercase mb-4 inline-block border border-indigo-100">
+                     {resource.type}
+                   </div>
+                   <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">{resource.name}</h1>
+                   <div className="w-16 h-1.5 bg-blue-600 rounded-full mb-6"></div>
+                   <p className="text-slate-600 text-lg leading-relaxed">
+                     {resource.description || `The ${resource.name} is a state-of-the-art facility located seamlessly within the ${resource.location}. Designed to support the academic and extracurricular needs of the SmartUniNexus structure, it ensures high reliability and comfort for up to ${resource.capacity} occupants.`}
+                   </p>
+                </div>
 
-             <div className="space-y-6 lg:border-l lg:border-slate-100 lg:pl-10">
-               <div>
-                  <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4">Specifications</h4>
-                  
-                  <div className="flex items-center gap-4 text-slate-700 mb-5 pb-5 border-b border-slate-50">
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-                      <MapPin size={24} />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-semibold mb-0.5 tracking-wide">LOCATION</p>
-                      <p className="font-bold">{resource.location}</p>
-                    </div>
-                  </div>
+                <div className="mt-auto pt-8 border-t border-slate-100">
+                   <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">Facility Specifications</h4>
+                   
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="bg-slate-50 p-5 rounded-2xl flex items-start gap-4 border border-slate-100 hover:border-blue-200 transition-colors group">
+                        <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <MapPin size={24} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500 font-bold mb-0.5 tracking-widest uppercase">Location</p>
+                          <p className="font-semibold text-slate-800 text-lg leading-snug">{resource.location}</p>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center gap-4 text-slate-700 mb-5 pb-5 border-b border-slate-50">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                      <Users size={24} />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-semibold mb-0.5 tracking-wide">MAX CAPACITY</p>
-                      <p className="font-bold">{resource.capacity} Persons</p>
-                    </div>
-                  </div>
+                      <div className="bg-slate-50 p-5 rounded-2xl flex items-start gap-4 border border-slate-100 hover:border-indigo-200 transition-colors group">
+                        <div className="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                          <Users size={24} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500 font-bold mb-0.5 tracking-widest uppercase">Max Capacity</p>
+                          <p className="font-semibold text-slate-800 text-lg leading-snug">{resource.capacity} <span className="text-sm text-slate-500 font-medium">people</span></p>
+                        </div>
+                      </div>
 
-                  <div className="flex items-center gap-4 text-slate-700 mb-5 pb-5 border-b border-slate-50">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                      <Clock size={24} />
-                    </div>
-                    <div>
-                      <p className="text-xs text-slate-500 font-semibold mb-0.5 tracking-wide">AVAILABILITY</p>
-                      <p className="font-bold">{resource.availabilityTime || 'Not specified'}</p>
-                    </div>
-                  </div>
-               </div>
-
-               <div className="pt-2">
-                 <p className="text-xs text-slate-500 font-semibold mb-2 tracking-wide uppercase">Operational Status</p>
-                 <div className={`w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 border shadow-sm ${
-                    resource.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 
-                    resource.status === 'MAINTENANCE' ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-red-50 text-red-700 border-red-200'
-                  }`}>
-                    {resource.status === 'ACTIVE' && <CheckCircle2 size={18} />} 
-                    <span className="tracking-wide">SYSTEM {resource.status.replace(/_/g, ' ')}</span>
-                 </div>
-                 
-                 {resource.status === 'ACTIVE' && (
-                    <button onClick={() => setShowModal(true)} className="mt-6 w-full py-4 rounded-xl bg-blue-600 text-white font-bold tracking-wide hover:bg-blue-700 transition-colors shadow-md flex justify-center items-center gap-2">
-                       <Calendar size={20} /> BOOK THIS RESOURCE
-                    </button>
-                 )}
-               </div>
+                      <div className="bg-slate-50 p-5 rounded-2xl flex items-start gap-4 border border-slate-100 hover:border-emerald-200 transition-colors sm:col-span-2 group">
+                        <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                          <Clock size={24} />
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-slate-500 font-bold mb-0.5 tracking-widest uppercase">Availability</p>
+                          <p className="font-semibold text-slate-800 text-lg leading-snug">{resource.availabilityTime || 'Not specified'}</p>
+                        </div>
+                      </div>
+                   </div>
+                </div>
              </div>
           </div>
        </div>

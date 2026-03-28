@@ -67,7 +67,7 @@ export const EditResource: React.FC = () => {
       await updateResource(id, payload);
 
       toast.success('Resource updated successfully!');
-      navigate('/app/facilities/resources/manage');
+      navigate('/app/facilities/resources');
     } catch {
       toast.error('Failed to update resource.');
     } finally {
@@ -172,7 +172,7 @@ export const EditResource: React.FC = () => {
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-200 flex justify-end gap-4">
-          <button type="button" onClick={() => navigate('/app/facilities/resources/manage')} className="px-6 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
+          <button type="button" onClick={() => navigate('/app/facilities/resources')} className="px-6 py-2.5 border border-slate-300 text-slate-700 rounded-lg text-sm font-semibold hover:bg-slate-50 transition-colors">
             Cancel
           </button>
           <button type="submit" disabled={loading} className="px-6 py-2.5 bg-blue-600 text-white rounded-lg inline-flex items-center gap-2 text-sm font-semibold shadow-md hover:bg-blue-700 focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-75 transition-colors">

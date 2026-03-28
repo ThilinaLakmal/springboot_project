@@ -139,7 +139,7 @@ export const ResourceList: React.FC = () => {
                       <Link to={`/app/facilities/resources/${resource.id}`} title="View Details" className="p-2 px-3 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors font-bold flex items-center gap-2">
                         <Eye size={16} /> <span className="hidden sm:inline">View</span>
                       </Link>
-                      <Link to={`/app/facilities/resources/manage/edit/${resource.id}`} title="Edit Resource" className="p-2 px-3 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold flex items-center gap-2">
+                      <Link to={`/app/facilities/resources/edit/${resource.id}`} title="Edit Resource" className="p-2 px-3 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold flex items-center gap-2">
                         <Edit2 size={16} /> <span className="hidden sm:inline">Edit</span>
                       </Link>
                       <button onClick={() => handleDelete(resource.id)} title="Delete Resource" className="p-2 px-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-bold flex items-center gap-2 shadow-sm active:scale-95">

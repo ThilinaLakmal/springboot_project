@@ -44,8 +44,8 @@ const App: React.FC = () => {
               <Route path="facilities/resources/add" element={<AddResource />} />
               <Route path="facilities/resources/manage" element={<ProtectedRoute requiredRole="ADMIN" />} >
                 <Route index element={<ManageResources />} />
-                <Route path="edit/:id" element={<EditResource />} />
               </Route>
+              <Route path="facilities/resources/edit/:id" element={<EditResource />} />
               <Route path="facilities/resources/:id" element={<ResourceDetails />} />
               <Route path="facilities/bookings/my" element={<MyBookings />} />
               <Route path="facilities/bookings/manage" element={<ProtectedRoute requiredRole="ADMIN" />}>
