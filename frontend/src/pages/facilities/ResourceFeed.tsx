@@ -91,7 +91,7 @@ export const ResourceFeed: React.FC = () => {
             {resources.map(resource => {
                const StatusIcon = getStatusConfig(resource.status).icon;
                return (
-                 <div key={resource.id} className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden group transition-all duration-300 hover:-translate-y-1 flex flex-col">
+                 <Link to={`/app/facilities/resources/${resource.id}`} key={resource.id} className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden group transition-all duration-300 hover:-translate-y-1 flex flex-col">
                     {/* Image Banner */}
                     <div className="h-56 relative overflow-hidden bg-slate-100">
                        {resource.imageUrl ? (
@@ -138,13 +138,13 @@ export const ResourceFeed: React.FC = () => {
                              {getStatusConfig(resource.status).label}
                           </div>
                           
-                          <Link to={`/app/facilities/resources/${resource.id}`} className="flex items-center text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors group/link p-2 -m-2">
+                          <span className="flex items-center text-sm font-bold text-blue-600 group-hover:text-blue-800 transition-colors p-2 -m-2">
                              Explore
-                             <ChevronRight size={16} className="ml-0.5 group-hover/link:translate-x-1 transition-transform" />
-                          </Link>
+                             <ChevronRight size={16} className="ml-0.5 group-hover:-translate-x-[-4px] transition-transform duration-300" />
+                          </span>
                        </div>
                     </div>
-                 </div>
+                 </Link>
                );
             })}
          </div>
