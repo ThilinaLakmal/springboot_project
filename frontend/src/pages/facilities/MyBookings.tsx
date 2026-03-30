@@ -1,25 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 import { getMyBookings, cancelBooking } from '../../api/bookingApi';
 import { Booking } from '../../api/bookingApi';
 import { Calendar, Clock, XCircle, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const MyBookings: React.FC = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const lastUserIdRef = useRef<string | null>(null); // Avoid duplicate fetch per user in React 18 strict dev
 
   useEffect(() => {
+    const currentId = user?.id ?? null;
+    if (lastUserIdRef.current === currentId) return;
+    lastUserIdRef.current = currentId;
     fetchBookings();
-  }, []);
+  }, [user?.id]);
 
   const fetchBookings = async () => {
+    // If no user session, show empty state and skip request
+    if (!user?.id) {
+      setBookings([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      // Hardcoded userId 1 for demo purposes
-      const data = await getMyBookings(1);
+      const data = await getMyBookings(Number(user.id));
       setBookings(data);
     } catch (err) {
-      toast.error('Failed to load your reservations.');
+      const friendlyMessage = axios.isAxiosError(err)
+        ? err.response?.data?.message || `Failed to load your reservations (${err.response?.status || 'network error'}).`
+        : 'Failed to load your reservations.';
+      toast.error(friendlyMessage, { id: 'load-reservations' });
     } finally {
       setLoading(false);
     }
