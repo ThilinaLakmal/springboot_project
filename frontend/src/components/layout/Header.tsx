@@ -1,5 +1,5 @@
 import React from 'react';
-import { Bell, Search, LogOut, User as UserIcon } from 'lucide-react';
+import { Bell, LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -15,20 +15,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="h-16 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-6 sticky top-0 z-30">
-      {/* Search Bar Placeholder */}
-      <div className="flex-1 flex justify-start">
-        <div className="relative w-full max-w-sm hidden md:flex items-center">
-          <Search className="absolute left-3 text-slate-400" size={18} />
-          <input 
-            type="text" 
-            placeholder="Search resources, facilities..." 
-            className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-colors"
-          />
-        </div>
-      </div>
-
-      {/* Right Actions */}
+    <header className="h-16 bg-white border-b border-slate-200 shadow-sm flex items-center justify-end px-6 sticky top-0 z-30">
       <div className="flex items-center gap-5">
         <button className="relative text-slate-500 hover:text-blue-600 transition-colors p-1">
           <Bell size={20} />
