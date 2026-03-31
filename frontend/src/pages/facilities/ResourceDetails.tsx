@@ -6,6 +6,7 @@ import { MapPin, Users, Clock, ArrowLeft, Image as ImageIcon, CheckCircle2, Cale
 import toast from 'react-hot-toast';
 import { createBooking } from '../../api/bookingApi';
 import { useAuth } from '../../contexts/AuthContext';
+import { ResourceAvailabilityCalendar } from '../../components/facilities/ResourceAvailabilityCalendar';
 
 export const ResourceDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -214,6 +215,32 @@ export const ResourceDetails: React.FC = () => {
               </div>
            </div>
         )}
+
+       {/* Availability Calendar Section */}
+       <div className="mt-8 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+              <Calendar size={22} className="text-blue-600" /> Availability Calendar
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">View booked and available time slots. Click on an empty slot to start a booking.</p>
+          </div>
+          <ResourceAvailabilityCalendar
+            resourceId={resource.id}
+            resourceName={resource.name}
+            availableFrom={resource.availableFrom || resource.availabilityTime?.split(' - ')[0]}
+            availableTo={resource.availableTo || resource.availabilityTime?.split(' - ')[1]}
+            onSlotSelect={(slotInfo) => {
+              setBookingData({
+                bookingDate: slotInfo.date,
+                startTime: slotInfo.startTime,
+                endTime: slotInfo.endTime,
+                purpose: '',
+                expectedAttendees: '',
+              });
+              setShowModal(true);
+            }}
+          />
+       </div>
     </div>
   );
 };
