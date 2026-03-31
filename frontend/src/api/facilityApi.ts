@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Facility, PageResponse } from '../types/facility';
 
-const API = axios.create({ baseURL: 'http://localhost:8080/api/v1' });
+const API = axios.create({ baseURL: 'http://localhost:8081/api/v1' });
 
 API.interceptors.request.use((config) => {
     // Basic auth added for demo purposes matching backend

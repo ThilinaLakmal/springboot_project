@@ -48,6 +48,11 @@ public class Booking {
     @Column(columnDefinition = "TEXT")
     private String purpose;
 
+    private Integer expectedAttendees;
+
+    @Column(columnDefinition = "TEXT")
+    private String adminReason;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;

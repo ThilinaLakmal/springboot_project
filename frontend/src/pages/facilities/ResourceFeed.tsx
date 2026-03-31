@@ -95,7 +95,7 @@ export const ResourceFeed: React.FC = () => {
                     {/* Image Banner */}
                     <div className="h-56 relative overflow-hidden bg-slate-100">
                        {resource.imageUrl ? (
-                         <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} 
+                         <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8081${resource.imageUrl}`} 
                               alt={resource.name} 
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                        ) : (

@@ -22,7 +22,7 @@ export const Login: React.FC = () => {
 
       if (email && password) {
         const mockUser: User = {
-          id: 'usr-1234',
+          id: '1',
           name: email.split('@')[0],
           email: email,
           role: role,

@@ -5,10 +5,12 @@ import { Resource } from '../../types/resource';
 import { MapPin, Users, Clock, ArrowLeft, Image as ImageIcon, CheckCircle2, Calendar, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { createBooking } from '../../api/bookingApi';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const ResourceDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [resource, setResource] = useState<Resource | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -18,7 +20,8 @@ export const ResourceDetails: React.FC = () => {
     bookingDate: '',
     startTime: '',
     endTime: '',
-    purpose: ''
+    purpose: '',
+    expectedAttendees: ''
   });
   const [bookingLoading, setBookingLoading] = useState(false);
 
@@ -54,7 +57,7 @@ export const ResourceDetails: React.FC = () => {
              <div className="lg:w-2/5 p-6 lg:border-r border-slate-100 bg-slate-50/50 flex flex-col items-center justify-start">
                 <div className="w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 shadow-inner relative group border border-slate-200/60">
                   {resource.imageUrl ? (
-                    <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8081${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                         <ImageIcon size={64} className="mb-4 opacity-30" />
@@ -158,11 +161,16 @@ export const ResourceDetails: React.FC = () => {
                     e.preventDefault();
                     setBookingLoading(true);
                     try {
-                       // We assume userId is 1 for currently logged in demo user
-                       await createBooking({ ...bookingData, resourceId: resource.id, userId: 1 });
+                       const userId = user?.id ? Number(user.id) : 1;
+                       await createBooking({ 
+                         ...bookingData, 
+                         resourceId: resource.id, 
+                         userId,
+                         expectedAttendees: bookingData.expectedAttendees ? parseInt(bookingData.expectedAttendees) : undefined 
+                       });
                        toast.success('Booking requested successfully!');
                        setShowModal(false);
-                       setBookingData({ bookingDate: '', startTime: '', endTime: '', purpose: ''});
+                       setBookingData({ bookingDate: '', startTime: '', endTime: '', purpose: '', expectedAttendees: ''});
                     } catch (err: any) {
                        toast.error(err.response?.data?.error || 'Failed to request booking');
                     } finally {
@@ -185,6 +193,11 @@ export const ResourceDetails: React.FC = () => {
                          <input type="time" required value={bookingData.endTime} onChange={e => setBookingData({...bookingData, endTime: e.target.value})} 
                            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" />
                        </div>
+                    </div>
+                    <div>
+                       <label className="block text-sm font-semibold text-slate-700 mb-1">Expected Attendees</label>
+                       <input type="number" min="1" max={resource.capacity} value={bookingData.expectedAttendees} onChange={e => setBookingData({...bookingData, expectedAttendees: e.target.value})} 
+                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder={`Max capacity: ${resource.capacity}`} />
                     </div>
                     <div>
                        <label className="block text-sm font-semibold text-slate-700 mb-1">Purpose</label>
