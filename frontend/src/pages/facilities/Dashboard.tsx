@@ -74,50 +74,50 @@ export const Dashboard: React.FC = () => {
 
   const systemHealth = stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 100;
 
-  return (
-    <div className="p-4 md:p-8 max-w-7xl mx-auto animate-fade-in-up">
-      
-      {/* Hero Banner Section */}
-      <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white mb-10 relative overflow-hidden shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8">
-         <div className="relative z-10 w-full md:w-2/3">
-            <div className="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-6 backdrop-blur-md border border-blue-500/30">
-               <Activity size={14} /> System Online
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black mb-4 tracking-tight leading-tight">
-               Welcome back, <span className="text-blue-400">{user?.name || 'Administrator'}</span>! 👋
-            </h1>
-            <p className="text-slate-400 text-lg md:text-xl max-w-2xl leading-relaxed mb-8">
-               Your campus infrastructure is running smoothly. Monitor real-time facility metrics, handle bookings, and manage asset maintenance all in one place.
-            </p>
-            
-            <div className="flex flex-wrap gap-4">
-               <Link to="/app/facilities/resources/add" className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all hover:-translate-y-1 shadow-lg shadow-blue-600/30">
-                  <Zap size={18} /> Register Facility
-               </Link>
-               <Link to="/feed" className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all hover:-translate-y-1">
-                  View Public Feed <ArrowRight size={18} />
-               </Link>
-            </div>
-         </div>
-         
-         <div className="relative z-10 w-full md:w-1/3 flex justify-center md:justify-end">
-            <div className="relative w-48 h-48">
-               <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-                  <path className="text-slate-800" strokeWidth="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  <path className={`${systemHealth >= 90 ? 'text-emerald-500' : systemHealth >= 70 ? 'text-blue-500' : 'text-amber-500'}`} strokeDasharray={`${systemHealth}, 100`} strokeWidth="3" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-               </svg>
-               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-4xl font-black text-white">{systemHealth}%</span>
-                  <span className="text-xs uppercase tracking-widest text-slate-400 font-bold mt-1">Health</span>
+   return (
+      <div className="p-4 md:p-8 max-w-7xl mx-auto animate-fade-in-up">
+
+         {/* Admin Control Header */}
+         <div className="bg-white border border-slate-200 rounded-2xl shadow-sm mb-10 p-6 md:p-8">
+            <div className="flex flex-col gap-6 md:gap-0 md:flex-row md:items-center md:justify-between">
+               <div className="space-y-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-widest">
+                     <Activity size={14} /> Admin View
+                  </div>
+                  <div>
+                     <h1 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">Operations control center</h1>
+                     <p className="text-slate-600 mt-2 max-w-2xl">Monitor asset health, bookings, and maintenance at a glance. Keep the platform stable and act quickly when something drifts.</p>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                     <Link to="/app/facilities/resources" className="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-800 font-semibold hover:bg-slate-100 transition">View resources</Link>
+                     <Link to="/app/facilities/resources/add" className="px-4 py-2.5 rounded-xl bg-blue-600 text-white font-semibold flex items-center gap-2 hover:bg-blue-700 transition shadow-sm">
+                        <Zap size={16} /> Register facility
+                     </Link>
+                     <Link to="/app/facilities/bookings" className="px-4 py-2.5 rounded-xl bg-slate-900 text-white font-semibold flex items-center gap-2 hover:bg-slate-800 transition">
+                        <Calendar size={16} /> Manage bookings
+                     </Link>
+                  </div>
+               </div>
+
+               <div className="flex items-center gap-4">
+                  <div className="relative w-28 h-28">
+                     <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                        <path className="text-slate-200" strokeWidth="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path className={`${systemHealth >= 90 ? 'text-emerald-500' : systemHealth >= 70 ? 'text-blue-500' : 'text-amber-500'}`} strokeDasharray={`${systemHealth}, 100`} strokeWidth="3" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                     </svg>
+                     <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-black text-slate-900">{systemHealth}%</span>
+                        <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold mt-1">Health</span>
+                     </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                     <div className="flex items-center gap-2 text-sm text-slate-600"><CheckCircle2 size={16} className="text-emerald-500" /> {stats.active} active</div>
+                     <div className="flex items-center gap-2 text-sm text-slate-600"><AlertTriangle size={16} className="text-amber-500" /> {stats.maintenance} in maintenance</div>
+                     <div className="flex items-center gap-2 text-sm text-slate-600"><ShieldCheck size={16} className="text-red-500" /> {stats.outOfService} out of service</div>
+                  </div>
                </div>
             </div>
          </div>
-
-         {/* Decorative Background Icon */}
-         <div className="absolute -bottom-10 -right-10 opacity-5 pointer-events-none text-white">
-            <Building2 size={350} />
-         </div>
-      </div>
 
       {/* Quick Metrics Grid */}
       <h3 className="text-lg font-bold text-slate-800 mb-4 px-2 tracking-tight">Infrastructure Overview</h3>
