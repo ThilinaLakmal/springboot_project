@@ -103,4 +103,15 @@ public class BookingController {
         bookingService.deleteBooking(id);
         return ResponseEntity.noContent().build();
     }
+
+    // POST /api/v1/bookings/checkin — QR-based check-in
+    @PostMapping("/checkin")
+    public ResponseEntity<BookingDto> checkIn(@RequestBody Map<String, Long> body) {
+        Long resourceId = body.get("resourceId");
+        Long userId = body.get("userId");
+        if (resourceId == null || userId == null) {
+            throw new IllegalArgumentException("resourceId and userId are required for check-in");
+        }
+        return ResponseEntity.ok(bookingService.checkIn(resourceId, userId));
+    }
 }

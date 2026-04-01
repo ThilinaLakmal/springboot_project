@@ -173,6 +173,52 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
+    public BookingDto checkIn(Long resourceId, Long userId) {
+        log.info("Check-in attempt for resourceId: {} by userId: {}", resourceId, userId);
+
+        // Verify resource exists
+        resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found with ID: " + resourceId));
+
+        // Find approved bookings for this resource and user today
+        java.time.LocalDate today = java.time.LocalDate.now();
+        LocalTime now = LocalTime.now();
+
+        List<Booking> approvedBookings = bookingRepository.findApprovedBookingsForCheckIn(resourceId, userId, today);
+
+        if (approvedBookings.isEmpty()) {
+            throw new ValidationException("No approved booking found for this resource today. Please ensure your booking is approved before checking in.");
+        }
+
+        // Find a booking within the check-in time window: 15 min before to 30 min after start time
+        Booking matchingBooking = null;
+        for (Booking booking : approvedBookings) {
+            LocalTime windowStart = booking.getStartTime().minusMinutes(15);
+            LocalTime windowEnd = booking.getStartTime().plusMinutes(30);
+
+            if (!now.isBefore(windowStart) && !now.isAfter(windowEnd)) {
+                matchingBooking = booking;
+                break;
+            }
+        }
+
+        if (matchingBooking == null) {
+            // Build helpful error message showing what bookings exist
+            StringBuilder sb = new StringBuilder("Check-in is only allowed 15 minutes before to 30 minutes after your booking start time. Your bookings today: ");
+            for (Booking b : approvedBookings) {
+                sb.append(b.getStartTime()).append(" - ").append(b.getEndTime()).append("; ");
+            }
+            throw new ValidationException(sb.toString());
+        }
+
+        matchingBooking.setStatus(BookingStatus.CHECKED_IN);
+        matchingBooking = bookingRepository.save(matchingBooking);
+        log.info("Check-in successful for booking ID: {} at resource: {}", matchingBooking.getId(), resourceId);
+        return mapToDto(matchingBooking);
+    }
+
+    @Override
+    @Transactional
     public void deleteBooking(Long id) {
         if (!bookingRepository.existsById(id)) {
             throw new ResourceNotFoundException("Booking not found with ID: " + id);

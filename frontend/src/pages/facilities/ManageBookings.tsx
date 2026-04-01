@@ -4,13 +4,14 @@ import { Booking } from '../../api/bookingApi';
 import { Calendar, Clock, User, Check, X, ShieldAlert, Filter, Users, MessageSquare, MapPin } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const STATUS_TABS = ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'] as const;
+const STATUS_TABS = ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED', 'CHECKED_IN'] as const;
 
 const statusStyles: Record<string, string> = {
   APPROVED: 'bg-emerald-50 text-emerald-600 border-emerald-200',
   PENDING: 'bg-amber-50 text-amber-600 border-amber-200',
   REJECTED: 'bg-red-50 text-red-600 border-red-200',
   CANCELLED: 'bg-slate-100 text-slate-500 border-slate-200',
+  CHECKED_IN: 'bg-blue-50 text-blue-600 border-blue-200',
 };
 
 export const ManageBookings: React.FC = () => {

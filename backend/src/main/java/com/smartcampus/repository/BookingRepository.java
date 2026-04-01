@@ -55,4 +55,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             @Param("startTime") LocalTime startTime,
             @Param("endTime") LocalTime endTime,
             @Param("excludeId") Long excludeId);
+
+    // Find approved booking for check-in validation
+    @Query("SELECT b FROM Booking b WHERE b.resource.id = :resourceId AND b.user.id = :userId " +
+           "AND b.bookingDate = :today AND b.status = com.smartcampus.model.enums.BookingStatus.APPROVED " +
+           "ORDER BY b.startTime ASC")
+    List<Booking> findApprovedBookingsForCheckIn(
+            @Param("resourceId") Long resourceId,
+            @Param("userId") Long userId,
+            @Param("today") LocalDate today);
 }

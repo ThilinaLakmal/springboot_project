@@ -80,3 +80,9 @@ export const updateBookingStatus = async (id: number, status: string): Promise<B
   });
   return response.data;
 };
+
+// QR-based check-in
+export const checkIn = async (resourceId: number, userId: number): Promise<Booking> => {
+  const response = await api.post('/bookings/checkin', { resourceId, userId });
+  return response.data;
+};

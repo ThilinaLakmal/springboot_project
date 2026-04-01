@@ -14,5 +14,6 @@ public interface BookingService {
     BookingDto approveBooking(Long id, String reason);
     BookingDto rejectBooking(Long id, String reason);
     BookingDto cancelBooking(Long id);
+    BookingDto checkIn(Long resourceId, Long userId);
     void deleteBooking(Long id);
 }

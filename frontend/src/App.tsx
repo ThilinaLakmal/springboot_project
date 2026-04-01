@@ -17,8 +17,9 @@ import { ManageResources } from './pages/facilities/ManageResources';
 import { MyBookings } from './pages/facilities/MyBookings';
 import { ManageBookings } from './pages/facilities/ManageBookings';
 import { ResourceDetails } from './pages/facilities/ResourceDetails';
+import { QRCodeGenerator } from './pages/facilities/QRCodeGenerator';
+import { QRScanner } from './pages/facilities/QRScanner';
 
-// Blank
 
 const App: React.FC = () => {
   return (
@@ -53,6 +54,12 @@ const App: React.FC = () => {
               <Route path="facilities/bookings/my" element={<MyBookings />} />
               <Route path="facilities/bookings/manage" element={<ProtectedRoute requiredRole="ADMIN" />}>
                 <Route index element={<ManageBookings />} />
+              </Route>
+
+              {/* QR Check-In Routes */}
+              <Route path="facilities/scan" element={<QRScanner />} />
+              <Route path="facilities/qr-codes" element={<ProtectedRoute requiredRole="ADMIN" />}>
+                <Route index element={<QRCodeGenerator />} />
               </Route>
 
               {/* Other modules placeholders */}
