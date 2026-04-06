@@ -11,10 +11,10 @@ export const Sidebar: React.FC = () => {
     { label: 'Dashboard', path: '/app/facilities/dashboard', icon: LayoutDashboard },
     { label: 'Campus Feed', path: '/app/facilities/feed', icon: LayoutList },
     { label: 'Resource List', path: '/app/facilities/resources', icon: Box, exact: true },
-    { label: 'Booking History', path: '/app/facilities/bookings/my', icon: Box },
   ];
 
   if (!isAdmin) {
+    navItems.push({ label: 'Booking History', path: '/app/facilities/bookings/my', icon: Box });
     navItems.push({ label: 'Scan QR', path: '/app/facilities/scan', icon: Camera });
   }
 
