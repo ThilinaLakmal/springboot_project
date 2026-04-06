@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown, LayoutList } from 'lucide-react';
+import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown, LayoutList, QrCode, Camera } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
@@ -12,12 +12,17 @@ export const Sidebar: React.FC = () => {
     { label: 'Campus Feed', path: '/app/facilities/feed', icon: LayoutList },
     { label: 'Resource List', path: '/app/facilities/resources', icon: Box, exact: true },
     { label: 'Booking History', path: '/app/facilities/bookings/my', icon: Box },
-    { label: 'Add Resource', path: '/app/facilities/resources/add', icon: PlusCircle },
   ];
 
+  if (!isAdmin) {
+    navItems.push({ label: 'Scan QR', path: '/app/facilities/scan', icon: Camera });
+  }
+
   if (isAdmin) {
+    navItems.push({ label: 'Add Resource', path: '/app/facilities/resources/add', icon: PlusCircle });
     navItems.push({ label: 'Manage Resources', path: '/app/facilities/resources/manage', icon: Settings });
     navItems.push({ label: 'Manage Bookings', path: '/app/facilities/bookings/manage', icon: Settings });
+    navItems.push({ label: 'QR Codes', path: '/app/facilities/qr-codes', icon: QrCode });
   }
 
   return (

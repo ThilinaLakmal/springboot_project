@@ -58,7 +58,6 @@ set ERROR_CODE=0
 @setlocal
 
 @REM ==== START VALIDATION ====
-set "JAVA_HOME=C:\Program Files\JetBrains\IntelliJ IDEA 2025.3.2\jbr"
 if not "%JAVA_HOME%" == "" goto OkJHome
 
 echo.

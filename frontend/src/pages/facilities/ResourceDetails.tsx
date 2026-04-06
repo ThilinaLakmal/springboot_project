@@ -5,10 +5,13 @@ import { Resource } from '../../types/resource';
 import { MapPin, Users, Clock, ArrowLeft, Image as ImageIcon, CheckCircle2, Calendar, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { createBooking } from '../../api/bookingApi';
+import { useAuth } from '../../contexts/AuthContext';
+import { ResourceAvailabilityCalendar } from '../../components/facilities/ResourceAvailabilityCalendar';
 
 export const ResourceDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [resource, setResource] = useState<Resource | null>(null);
   const [loading, setLoading] = useState(true);
   
@@ -18,7 +21,8 @@ export const ResourceDetails: React.FC = () => {
     bookingDate: '',
     startTime: '',
     endTime: '',
-    purpose: ''
+    purpose: '',
+    expectedAttendees: ''
   });
   const [bookingLoading, setBookingLoading] = useState(false);
 
@@ -54,7 +58,7 @@ export const ResourceDetails: React.FC = () => {
              <div className="lg:w-2/5 p-6 lg:border-r border-slate-100 bg-slate-50/50 flex flex-col items-center justify-start">
                 <div className="w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 shadow-inner relative group border border-slate-200/60">
                   {resource.imageUrl ? (
-                    <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8081${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center text-slate-400">
                         <ImageIcon size={64} className="mb-4 opacity-30" />
@@ -158,11 +162,16 @@ export const ResourceDetails: React.FC = () => {
                     e.preventDefault();
                     setBookingLoading(true);
                     try {
-                       // We assume userId is 1 for currently logged in demo user
-                       await createBooking({ ...bookingData, resourceId: resource.id, userId: 1 });
+                       const userId = user?.id ? Number(user.id) : 1;
+                       await createBooking({ 
+                         ...bookingData, 
+                         resourceId: resource.id, 
+                         userId,
+                         expectedAttendees: bookingData.expectedAttendees ? parseInt(bookingData.expectedAttendees) : undefined 
+                       });
                        toast.success('Booking requested successfully!');
                        setShowModal(false);
-                       setBookingData({ bookingDate: '', startTime: '', endTime: '', purpose: ''});
+                       setBookingData({ bookingDate: '', startTime: '', endTime: '', purpose: '', expectedAttendees: ''});
                     } catch (err: any) {
                        toast.error(err.response?.data?.error || 'Failed to request booking');
                     } finally {
@@ -187,6 +196,11 @@ export const ResourceDetails: React.FC = () => {
                        </div>
                     </div>
                     <div>
+                       <label className="block text-sm font-semibold text-slate-700 mb-1">Expected Attendees</label>
+                       <input type="number" min="1" max={resource.capacity} value={bookingData.expectedAttendees} onChange={e => setBookingData({...bookingData, expectedAttendees: e.target.value})} 
+                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder={`Max capacity: ${resource.capacity}`} />
+                    </div>
+                    <div>
                        <label className="block text-sm font-semibold text-slate-700 mb-1">Purpose</label>
                        <textarea required rows={3} value={bookingData.purpose} onChange={e => setBookingData({...bookingData, purpose: e.target.value})} 
                          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Briefly describe the purpose of booking..."></textarea>
@@ -201,6 +215,32 @@ export const ResourceDetails: React.FC = () => {
               </div>
            </div>
         )}
+
+       {/* Availability Calendar Section */}
+       <div className="mt-8 bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight flex items-center gap-2">
+              <Calendar size={22} className="text-blue-600" /> Availability Calendar
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">View booked and available time slots. Click on an empty slot to start a booking.</p>
+          </div>
+          <ResourceAvailabilityCalendar
+            resourceId={resource.id}
+            resourceName={resource.name}
+            availableFrom={resource.availableFrom || resource.availabilityTime?.split(' - ')[0]}
+            availableTo={resource.availableTo || resource.availabilityTime?.split(' - ')[1]}
+            onSlotSelect={(slotInfo) => {
+              setBookingData({
+                bookingDate: slotInfo.date,
+                startTime: slotInfo.startTime,
+                endTime: slotInfo.endTime,
+                purpose: '',
+                expectedAttendees: '',
+              });
+              setShowModal(true);
+            }}
+          />
+       </div>
     </div>
   );
 };

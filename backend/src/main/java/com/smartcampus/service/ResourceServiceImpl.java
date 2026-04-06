@@ -157,7 +157,7 @@ public class ResourceServiceImpl implements ResourceService {
             String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
             Path filePath = uploadPath.resolve(fileName);
             Files.copy(file.getInputStream(), filePath);
-            return "http://localhost:8080/uploads/resources/" + fileName;
+            return "/uploads/resources/" + fileName;
         } catch (Exception e) {
             log.error("Could not upload image", e);
             throw new RuntimeException("Could not store image");

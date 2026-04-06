@@ -4,8 +4,10 @@ import { Resource } from '../../types/resource';
 import { Search, Filter, Box, ChevronLeft, ChevronRight, Edit2, Trash2, Eye } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export const ResourceList: React.FC = () => {
+  const { isAdmin } = useAuth();
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -113,7 +115,7 @@ export const ResourceList: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100/50 overflow-hidden">
                         {resource.imageUrl ? (
-                          <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8080${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover" />
+                          <img src={resource.imageUrl.startsWith('http') ? resource.imageUrl : `http://localhost:8081${resource.imageUrl}`} alt={resource.name} className="w-full h-full object-cover" />
                         ) : (
                           <Box size={20} />
                         )}
@@ -139,12 +141,16 @@ export const ResourceList: React.FC = () => {
                       <Link to={`/app/facilities/resources/${resource.id}`} title="View Details" className="p-2 px-3 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors font-bold flex items-center gap-2">
                         <Eye size={16} /> <span className="hidden sm:inline">View</span>
                       </Link>
-                      <Link to={`/app/facilities/resources/edit/${resource.id}`} title="Edit Resource" className="p-2 px-3 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold flex items-center gap-2">
-                        <Edit2 size={16} /> <span className="hidden sm:inline">Edit</span>
-                      </Link>
-                      <button onClick={() => handleDelete(resource.id)} title="Delete Resource" className="p-2 px-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-bold flex items-center gap-2 shadow-sm active:scale-95">
-                        <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
-                      </button>
+                      {isAdmin && (
+                        <>
+                          <Link to={`/app/facilities/resources/edit/${resource.id}`} title="Edit Resource" className="p-2 px-3 text-amber-600 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors font-bold flex items-center gap-2">
+                            <Edit2 size={16} /> <span className="hidden sm:inline">Edit</span>
+                          </Link>
+                          <button onClick={() => handleDelete(resource.id)} title="Delete Resource" className="p-2 px-3 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors font-bold flex items-center gap-2 shadow-sm active:scale-95">
+                            <Trash2 size={16} /> <span className="hidden sm:inline">Delete</span>
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
