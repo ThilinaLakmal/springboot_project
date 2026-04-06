@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getResources } from '../../api/resourceApi';
 import { Resource } from '../../types/resource';
-import { Search, MapPin, Users, Clock, CheckCircle2, AlertCircle, Wrench, ChevronRight } from 'lucide-react';
+import { Search, MapPin, Users, Clock, CheckCircle2, AlertCircle, Wrench, ChevronRight, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 
@@ -9,20 +9,23 @@ export const ResourceFeed: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [capacityFilter, setCapacityFilter] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const handler = setTimeout(() => {
       fetchResources();
     }, 300);
     return () => clearTimeout(handler);
-  }, [search]);
+  }, []);
 
   const fetchResources = async () => {
     try {
       setLoading(true);
-      // Fetch a larger set for the feed, or rely on infinity scroll/pagination if needed
-      // Here we just fetch page 0, size 50 for a nice long feed
-      const res = await getResources(0, 50, search, '');
+      // Load a broad set and filter on client for type, location and capacity
+      const res = await getResources(0, 500, '', '');
       setResources(res.content || []);
     } catch (err) {
       toast.error('Failed to load resource feed.');
@@ -38,6 +41,37 @@ export const ResourceFeed: React.FC = () => {
       case 'MAINTENANCE': return { bg: 'bg-amber-500', text: 'text-white', icon: Wrench, label: 'Maintenance' };
       default: return { bg: 'bg-red-500', text: 'text-white', icon: AlertCircle, label: 'Out of Service' };
     }
+  };
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const normalizedLocationFilter = locationFilter.trim().toLowerCase();
+  const capacityValue = capacityFilter ? Number(capacityFilter) : null;
+
+  const filteredResources = resources.filter((resource) => {
+    const resourceType = (resource.type || '').toLowerCase();
+    const resourceLocation = (resource.location || '').toLowerCase();
+    const resourceCapacity = String(resource.capacity || '');
+
+    const matchesSearch =
+      !normalizedSearch ||
+      resourceType.includes(normalizedSearch) ||
+      resourceLocation.includes(normalizedSearch) ||
+      resourceCapacity.includes(normalizedSearch);
+
+    const matchesType = !typeFilter || resource.type === typeFilter;
+    const matchesLocation = !normalizedLocationFilter || resourceLocation.includes(normalizedLocationFilter);
+    const matchesCapacity = capacityValue === null || resource.capacity === capacityValue;
+
+    return matchesSearch && matchesType && matchesLocation && matchesCapacity;
+  });
+
+  const typeOptions = Array.from(new Set(resources.map((r) => r.type))).sort((a, b) => a.localeCompare(b));
+
+  const clearAllFilters = () => {
+    setSearch('');
+    setTypeFilter('');
+    setLocationFilter('');
+    setCapacityFilter('');
   };
 
   return (
@@ -59,26 +93,82 @@ export const ResourceFeed: React.FC = () => {
       </header>
 
       <div className="p-4 md:p-8 max-w-7xl mx-auto animate-fade-in-up">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-6">
         <div>
           <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">Campus Feed</h1>
           <p className="text-slate-500 mt-2 text-lg">Discover and explore top facilities ready for your next big idea.</p>
         </div>
-        <div className="w-full md:w-80 relative group">
-           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
-           <input type="text" placeholder="Find a spot..."
-             value={search}
-             onChange={e => setSearch(e.target.value)}
-             className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl text-slate-700 font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none shadow-sm"
-           />
+        <div className="w-full md:w-[460px]">
+          <div className="flex gap-3">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={20} />
+              <input type="text" placeholder="Search by type, capacity or location..."
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                className="w-full pl-12 pr-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl text-slate-700 font-medium focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all outline-none shadow-sm"
+              />
+            </div>
+            <button onClick={() => setShowFilters((prev) => !prev)} className="px-4 py-3.5 bg-white border-2 border-slate-200 rounded-2xl text-slate-700 font-semibold hover:bg-slate-50 transition flex items-center gap-2">
+              <Filter size={18} /> Filters
+            </button>
+          </div>
         </div>
       </div>
+
+      {showFilters && (
+        <div className="mb-8 p-4 md:p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Type</label>
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+              >
+                <option value="">All Types</option>
+                {typeOptions.map((type) => (
+                  <option key={type} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Location</label>
+              <input
+                type="text"
+                placeholder="e.g. main building"
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Capacity</label>
+              <input
+                type="number"
+                min={0}
+                placeholder="e.g. 120"
+                value={capacityFilter}
+                onChange={(e) => setCapacityFilter(e.target.value)}
+                className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button onClick={clearAllFilters} className="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">
+                Clear
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {loading ? (
          <div className="flex justify-center items-center py-20">
             <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600"></div>
          </div>
-      ) : resources.length === 0 ? (
+      ) : filteredResources.length === 0 ? (
          <div className="bg-white rounded-3xl p-16 text-center shadow-sm border border-slate-100">
             <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
                <Search size={32} />
@@ -88,7 +178,7 @@ export const ResourceFeed: React.FC = () => {
          </div>
       ) : (
          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {resources.map(resource => {
+            {filteredResources.map(resource => {
                const StatusIcon = getStatusConfig(resource.status).icon;
                return (
                  <Link to={`/app/facilities/resources/${resource.id}`} key={resource.id} className="bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden group transition-all duration-300 hover:-translate-y-1 flex flex-col">

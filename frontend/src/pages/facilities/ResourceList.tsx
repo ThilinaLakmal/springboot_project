@@ -16,22 +16,18 @@ export const ResourceList: React.FC = () => {
   const [size] = useState(12);
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
-  const [totalPages, setTotalPages] = useState(1);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   useEffect(() => {
-    const handler = setTimeout(() => {
-      fetchResources();
-    }, 300);
-    return () => clearTimeout(handler);
-  }, [page, search, type]);
+    fetchResources();
+  }, []);
 
   const fetchResources = async () => {
     try {
       setLoading(true);
-      const res = await getResources(page, size, search, type);
+      // Load a broad set once, then apply search/filters on the client
+      const res = await getResources(0, 500, '', '');
       setResources(res.content || []);
-      setTotalPages(res.totalPages || 1);
     } catch (err) {
       toast.error('Failed to load resources.');
       setResources([]);
@@ -54,6 +50,38 @@ export const ResourceList: React.FC = () => {
     }
   };
 
+  const normalizedSearch = search.trim().toLowerCase();
+
+  const filteredResources = resources.filter((resource) => {
+    const resourceType = (resource.type || '').toLowerCase();
+    const resourceLocation = (resource.location || '').toLowerCase();
+    const resourceCapacity = String(resource.capacity || '');
+
+    const matchesSearch =
+      !normalizedSearch ||
+      resourceType.includes(normalizedSearch) ||
+      resourceLocation.includes(normalizedSearch) ||
+      resourceCapacity.includes(normalizedSearch);
+
+    const matchesType = !type || resource.type === type;
+
+    return matchesSearch && matchesType;
+  });
+
+  const totalPages = Math.max(1, Math.ceil(filteredResources.length / size));
+  const currentPage = Math.min(page, totalPages - 1);
+  const paginatedResources = filteredResources.slice(currentPage * size, currentPage * size + size);
+
+  const typeOptions = [
+    { value: '', label: 'All Types' },
+    { value: 'LECTURE_HALL', label: 'Hall' },
+    { value: 'LAB', label: 'Lab' },
+    { value: 'LIBRARY', label: 'Library' },
+    { value: 'SPORTS_ARENA', label: 'Sport' },
+    { value: 'OTHERS', label: 'Equipment' },
+    { value: 'OTHERS', label: 'Other' },
+  ];
+
   return (
     <div className="p-8 max-w-7xl mx-auto animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
@@ -64,7 +92,7 @@ export const ResourceList: React.FC = () => {
         <div className="flex gap-3 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input type="text" placeholder="Search name or location..."
+            <input type="text" placeholder="Search type, capacity or location..."
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(0); }}
               className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 transition-shadow outline-none"
@@ -77,15 +105,17 @@ export const ResourceList: React.FC = () => {
       </div>
 
       {isFilterOpen && (
-        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-center gap-4 animate-fade-in">
-          <label className="text-sm font-semibold text-slate-700">Filter by Type:</label>
-          <select value={type} onChange={e => { setType(e.target.value); setPage(0); }} className="px-4 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none w-48 appearance-none cursor-pointer">
-            <option value="">All Types</option>
-            <option value="Hall">Lecture Halls</option>
-            <option value="Lab">Laboratories</option>
-            <option value="Library">Libraries</option>
-            <option value="Sports">Sports Arenas</option>
-          </select>
+        <div className="mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-fade-in">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Type</label>
+              <select value={type} onChange={e => { setType(e.target.value); setPage(0); }} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer">
+                {typeOptions.map((option) => (
+                  <option key={`${option.value || 'ALL'}-${option.label}`} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
       )}
 
@@ -106,10 +136,10 @@ export const ResourceList: React.FC = () => {
               {loading && (
                 <tr><td colSpan={6} className="h-48 text-center text-slate-500"><div className="animate-spin inline-block w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2"></div><br />Loading...</td></tr>
               )}
-              {!loading && resources.length === 0 && (
+              {!loading && paginatedResources.length === 0 && (
                 <tr><td colSpan={6} className="py-12 text-center text-slate-500 font-medium tracking-wide">No resources found matching criteria.</td></tr>
               )}
-              {!loading && resources.map(resource => (
+              {!loading && paginatedResources.map(resource => (
                 <tr key={resource.id} className="hover:bg-slate-50/70 transition-colors">
                   <td className="py-4 px-6">
                     <div className="flex items-center gap-3">
@@ -162,13 +192,13 @@ export const ResourceList: React.FC = () => {
         {/* Pagination Controls */}
         <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-sm text-slate-600">
           <div>
-            Showing page <span className="font-bold">{page + 1}</span> of <span className="font-bold">{totalPages}</span>
+            Showing page <span className="font-bold">{currentPage + 1}</span> of <span className="font-bold">{totalPages}</span>
           </div>
           <div className="flex gap-2">
-            <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
+            <button disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
               <ChevronLeft size={18} />
             </button>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
+            <button disabled={currentPage >= totalPages - 1} onClick={() => setPage(currentPage + 1)} className="p-1.5 bg-white border border-slate-300 rounded shadow-sm hover:bg-slate-50 disabled:opacity-50 transition">
               <ChevronRight size={18} />
             </button>
           </div>

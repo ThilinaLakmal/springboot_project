@@ -13,6 +13,9 @@ export const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({ total: 0, active: 0, maintenance: 0, outOfService: 0 });
   const [chartData, setChartData] = useState<any[]>([]);
   const [distributionData, setDistributionData] = useState<any[]>([]);
+  const [topResourcesData, setTopResourcesData] = useState<Array<{ name: string; bookings: number; confirmed: number }>>([]);
+  const [peakHoursData, setPeakHoursData] = useState<Array<{ hour: string; bookings: number }>>([]);
+  const [peakHourLabel, setPeakHourLabel] = useState('N/A');
 
   // User-specific state
   const [userBookings, setUserBookings] = useState<Booking[]>([]);
@@ -63,6 +66,52 @@ export const Dashboard: React.FC = () => {
             .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
             .slice(-7);
           setChartData(processedData.length > 0 ? processedData : [{ date: new Date().toISOString().split('T')[0], bookings: 0 }]);
+
+          const usageByResource: Record<string, { bookings: number; confirmed: number }> = {};
+          const usageByHour: Record<number, number> = {};
+
+          bookingsData.forEach((booking) => {
+            const resourceKey = booking.resourceName?.trim() || `Resource ${booking.resourceId}`;
+            if (!usageByResource[resourceKey]) usageByResource[resourceKey] = { bookings: 0, confirmed: 0 };
+            usageByResource[resourceKey].bookings += 1;
+
+            const status = (booking.status || '').toUpperCase();
+            if (status === 'APPROVED' || status === 'CHECKED_IN') {
+              usageByResource[resourceKey].confirmed += 1;
+            }
+
+            if (booking.startTime) {
+              const hour = Number(booking.startTime.split(':')[0]);
+              if (!Number.isNaN(hour) && hour >= 0 && hour <= 23) {
+                usageByHour[hour] = (usageByHour[hour] || 0) + 1;
+              }
+            }
+          });
+
+          const rankedResources = Object.entries(usageByResource)
+            .map(([name, data]) => ({ name, bookings: data.bookings, confirmed: data.confirmed }))
+            .sort((a, b) => b.bookings - a.bookings)
+            .slice(0, 5);
+          setTopResourcesData(
+            rankedResources.length > 0 ? rankedResources : [{ name: 'No booking data yet', bookings: 0, confirmed: 0 }]
+          );
+
+          const formatHourLabel = (hour: number) => {
+            const period = hour >= 12 ? 'PM' : 'AM';
+            const normalized = hour % 12 || 12;
+            return `${normalized} ${period}`;
+          };
+
+          const peakSeries = Array.from({ length: 24 }, (_, hour) => ({
+            hour: formatHourLabel(hour),
+            bookings: usageByHour[hour] || 0,
+          }));
+          setPeakHoursData(peakSeries);
+
+          const peakHour = Object.entries(usageByHour)
+            .map(([hour, count]) => ({ hour: Number(hour), count }))
+            .sort((a, b) => b.count - a.count)[0];
+          setPeakHourLabel(peakHour ? `${formatHourLabel(peakHour.hour)} (${peakHour.count})` : 'N/A');
 
         } else {
           // User: load personal bookings
@@ -264,6 +313,70 @@ export const Dashboard: React.FC = () => {
                     <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
                     <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }} />
                     <Area type="monotone" name="New Bookings" dataKey="bookings" stroke="#6366f1" strokeWidth={4} fillOpacity={1} fill="url(#colorBookings)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Usage Analytics */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 h-[430px] flex flex-col hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center mb-6">
+                <h4 className="text-sm flex items-center gap-2 font-bold text-slate-800 uppercase tracking-widest">
+                  <Building2 size={16} className="text-blue-500" /> Top Resources (Usage)
+                </h4>
+              </div>
+              <div className="flex-1 min-h-0 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={topResourcesData} layout="vertical" margin={{ top: 8, right: 8, left: 20, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f1f5f9" />
+                    <XAxis type="number" allowDecimals={false} tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} />
+                    <YAxis type="category" dataKey="name" width={150} tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }} axisLine={false} tickLine={false} />
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }} />
+                    <Legend iconType="circle" wrapperStyle={{ paddingTop: '14px', fontSize: '13px', fontWeight: '600', color: '#64748b' }} />
+                    <Bar name="Bookings" dataKey="bookings" fill="#2563eb" radius={[0, 8, 8, 0]} />
+                    <Bar name="Approved / Checked-in" dataKey="confirmed" fill="#6366f1" radius={[0, 8, 8, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 h-[430px] flex flex-col hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-sm flex items-center gap-2 font-bold text-slate-800 uppercase tracking-widest">
+                  <Clock size={16} className="text-indigo-500" /> Peak Booking Hours
+                </h4>
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">
+                  Hotspot: {peakHourLabel}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-blue-600">Most Active Slot</p>
+                  <p className="text-lg font-black text-slate-800 mt-1">{peakHourLabel}</p>
+                </div>
+                <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-3">
+                  <p className="text-[11px] font-bold uppercase tracking-widest text-indigo-600">Tracked Window</p>
+                  <p className="text-lg font-black text-slate-800 mt-1">24h pattern</p>
+                </div>
+              </div>
+
+              <div className="flex-1 min-h-0 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={peakHoursData}>
+                    <defs>
+                      <linearGradient id="peakHoursColor" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35}/>
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis dataKey="hour" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} axisLine={false} tickLine={false} interval={3} />
+                    <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                    <Tooltip contentStyle={{ borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', fontWeight: 'bold' }} />
+                    <Area type="monotone" dataKey="bookings" name="Bookings" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#peakHoursColor)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>

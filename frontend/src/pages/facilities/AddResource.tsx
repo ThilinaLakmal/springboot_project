@@ -83,6 +83,7 @@ export const AddResource: React.FC = () => {
                     <option value="Library">Library</option>
                     <option value="Sports">Sports Facility</option>
                     <option value="Equipment">Equipment</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
