@@ -2,15 +2,20 @@ import { useState } from 'react';
 
 function TicketListPage({ tickets, onViewDetails }) {
   const [searchText, setSearchText] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState('All');
 
   const filteredTickets = tickets.filter((ticket) => {
     const searchValue = searchText.toLowerCase();
 
-    return (
+    const matchesSearch =
       ticket.title.toLowerCase().includes(searchValue) ||
       ticket.category.toLowerCase().includes(searchValue) ||
-      ticket.status.toLowerCase().includes(searchValue)
-    );
+      ticket.status.toLowerCase().includes(searchValue);
+
+    const matchesPriority =
+      priorityFilter === 'All' || ticket.priority === priorityFilter;
+
+    return matchesSearch && matchesPriority;
   });
 
   const getPriorityBadgeClass = (priority) => {
@@ -50,14 +55,29 @@ function TicketListPage({ tickets, onViewDetails }) {
       <div className="card shadow p-4">
         <h2 className="mb-4 text-primary">All Incident Tickets</h2>
 
-        <div className="mb-3">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search by title, category, or status"
-            value={searchText}
-            onChange={(event) => setSearchText(event.target.value)}
-          />
+        <div className="row g-3 mb-3">
+          <div className="col-md-8">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by title, category, or status"
+              value={searchText}
+              onChange={(event) => setSearchText(event.target.value)}
+            />
+          </div>
+
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={priorityFilter}
+              onChange={(event) => setPriorityFilter(event.target.value)}
+            >
+              <option value="All">All Priorities</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
         </div>
 
         <table className="table table-bordered table-striped align-middle">
