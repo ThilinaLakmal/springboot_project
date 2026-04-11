@@ -25,7 +25,8 @@ function TicketListPage({ tickets, onViewDetails }) {
     const matchesSearch =
       ticket.title.toLowerCase().includes(searchValue) ||
       ticket.category.toLowerCase().includes(searchValue) ||
-      ticket.status.toLowerCase().includes(searchValue);
+      ticket.status.toLowerCase().includes(searchValue) ||
+      ticket.createdAt.toLowerCase().includes(searchValue);
 
     const matchesPriority =
       priorityFilter === 'All' || ticket.priority === priorityFilter;
@@ -59,6 +60,14 @@ function TicketListPage({ tickets, onViewDetails }) {
 
     if (sortBy === 'STATUS_DESC') {
       return statusOrder[b.status] - statusOrder[a.status];
+    }
+
+    if (sortBy === 'CREATED_NEWEST') {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    }
+
+    if (sortBy === 'CREATED_OLDEST') {
+      return new Date(a.createdAt) - new Date(b.createdAt);
     }
 
     return 0;
@@ -131,7 +140,7 @@ function TicketListPage({ tickets, onViewDetails }) {
             <input
               type="text"
               className="form-control"
-              placeholder="Search by title, category, or status"
+              placeholder="Search by title, category, status, or created time"
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
             />
@@ -176,6 +185,8 @@ function TicketListPage({ tickets, onViewDetails }) {
               <option value="PRIORITY_LOW_HIGH">Sort by Priority: Low to High</option>
               <option value="STATUS_ASC">Sort by Status: OPEN to CLOSED</option>
               <option value="STATUS_DESC">Sort by Status: CLOSED to OPEN</option>
+              <option value="CREATED_NEWEST">Sort by Created Time: Newest First</option>
+              <option value="CREATED_OLDEST">Sort by Created Time: Oldest First</option>
             </select>
           </div>
         </div>
