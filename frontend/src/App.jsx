@@ -53,6 +53,12 @@ function App() {
     },
   ]);
 
+  const getNavButtonClass = (pageName, defaultClass) => {
+    return currentPage === pageName
+      ? `${defaultClass} border border-light border-2`
+      : defaultClass;
+  };
+
   const addNewTicket = (newTicket) => {
     const ticketWithId = {
       ...newTicket,
@@ -209,29 +215,32 @@ function App() {
 
   return (
     <div>
-      <nav className="navbar navbar-dark bg-dark px-3">
-        <span className="navbar-brand mb-0 h1">Incident Management System</span>
-        <div>
-          <button
-            className="btn btn-primary me-2"
-            onClick={() => setCurrentPage('create')}
-          >
-            Create Ticket
-          </button>
+      <nav className="navbar navbar-dark bg-dark px-3 py-3">
+        <div className="container-fluid">
+          <span className="navbar-brand mb-0 h1">Incident Management System</span>
 
-          <button
-            className="btn btn-warning me-2"
-            onClick={() => setCurrentPage('list')}
-          >
-            View Tickets
-          </button>
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              className={getNavButtonClass('create', 'btn btn-primary')}
+              onClick={() => setCurrentPage('create')}
+            >
+              Create Ticket
+            </button>
 
-          <button
-            className="btn btn-info"
-            onClick={() => setCurrentPage('details')}
-          >
-            Ticket Details
-          </button>
+            <button
+              className={getNavButtonClass('list', 'btn btn-warning')}
+              onClick={() => setCurrentPage('list')}
+            >
+              View Tickets
+            </button>
+
+            <button
+              className={getNavButtonClass('details', 'btn btn-info')}
+              onClick={() => setCurrentPage('details')}
+            >
+              Ticket Details
+            </button>
+          </div>
         </div>
       </nav>
 
