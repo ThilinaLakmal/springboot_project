@@ -13,6 +13,38 @@ function TicketListPage({ tickets, onViewDetails }) {
     );
   });
 
+  const getPriorityBadgeClass = (priority) => {
+    if (priority === 'High') {
+      return 'bg-danger';
+    }
+
+    if (priority === 'Medium') {
+      return 'bg-warning text-dark';
+    }
+
+    return 'bg-success';
+  };
+
+  const getStatusBadgeClass = (status) => {
+    if (status === 'OPEN') {
+      return 'bg-primary';
+    }
+
+    if (status === 'IN_PROGRESS') {
+      return 'bg-warning text-dark';
+    }
+
+    if (status === 'RESOLVED') {
+      return 'bg-success';
+    }
+
+    if (status === 'CLOSED') {
+      return 'bg-secondary';
+    }
+
+    return 'bg-dark';
+  };
+
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
@@ -28,7 +60,7 @@ function TicketListPage({ tickets, onViewDetails }) {
           />
         </div>
 
-        <table className="table table-bordered table-striped">
+        <table className="table table-bordered table-striped align-middle">
           <thead>
             <tr>
               <th>ID</th>
@@ -46,8 +78,16 @@ function TicketListPage({ tickets, onViewDetails }) {
                   <td>{ticket.id}</td>
                   <td>{ticket.title}</td>
                   <td>{ticket.category}</td>
-                  <td>{ticket.priority}</td>
-                  <td>{ticket.status}</td>
+                  <td>
+                    <span className={`badge ${getPriorityBadgeClass(ticket.priority)}`}>
+                      {ticket.priority}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={`badge ${getStatusBadgeClass(ticket.status)}`}>
+                      {ticket.status}
+                    </span>
+                  </td>
                   <td>
                     <button
                       className="btn btn-sm btn-info"
