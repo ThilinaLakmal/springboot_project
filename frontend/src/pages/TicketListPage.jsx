@@ -4,6 +4,20 @@ function TicketListPage({ tickets, onViewDetails }) {
   const [searchText, setSearchText] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('All');
   const [statusFilter, setStatusFilter] = useState('All');
+  const [sortBy, setSortBy] = useState('ID_ASC');
+
+  const priorityOrder = {
+    High: 3,
+    Medium: 2,
+    Low: 1,
+  };
+
+  const statusOrder = {
+    OPEN: 1,
+    IN_PROGRESS: 2,
+    RESOLVED: 3,
+    CLOSED: 4,
+  };
 
   const filteredTickets = tickets.filter((ticket) => {
     const searchValue = searchText.toLowerCase();
@@ -20,6 +34,34 @@ function TicketListPage({ tickets, onViewDetails }) {
       statusFilter === 'All' || ticket.status === statusFilter;
 
     return matchesSearch && matchesPriority && matchesStatus;
+  });
+
+  const sortedTickets = [...filteredTickets].sort((a, b) => {
+    if (sortBy === 'ID_ASC') {
+      return a.id - b.id;
+    }
+
+    if (sortBy === 'ID_DESC') {
+      return b.id - a.id;
+    }
+
+    if (sortBy === 'PRIORITY_HIGH_LOW') {
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
+    }
+
+    if (sortBy === 'PRIORITY_LOW_HIGH') {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+
+    if (sortBy === 'STATUS_ASC') {
+      return statusOrder[a.status] - statusOrder[b.status];
+    }
+
+    if (sortBy === 'STATUS_DESC') {
+      return statusOrder[b.status] - statusOrder[a.status];
+    }
+
+    return 0;
   });
 
   const getPriorityBadgeClass = (priority) => {
@@ -58,6 +100,7 @@ function TicketListPage({ tickets, onViewDetails }) {
     setSearchText('');
     setPriorityFilter('All');
     setStatusFilter('All');
+    setSortBy('ID_ASC');
   };
 
   return (
@@ -75,7 +118,7 @@ function TicketListPage({ tickets, onViewDetails }) {
         </div>
 
         <div className="row g-3 mb-3">
-          <div className="col-md-6">
+          <div className="col-md-4">
             <input
               type="text"
               className="form-control"
@@ -85,7 +128,7 @@ function TicketListPage({ tickets, onViewDetails }) {
             />
           </div>
 
-          <div className="col-md-3">
+          <div className="col-md-2">
             <select
               className="form-select"
               value={priorityFilter}
@@ -98,7 +141,7 @@ function TicketListPage({ tickets, onViewDetails }) {
             </select>
           </div>
 
-          <div className="col-md-3">
+          <div className="col-md-2">
             <select
               className="form-select"
               value={statusFilter}
@@ -109,6 +152,21 @@ function TicketListPage({ tickets, onViewDetails }) {
               <option value="IN_PROGRESS">IN_PROGRESS</option>
               <option value="RESOLVED">RESOLVED</option>
               <option value="CLOSED">CLOSED</option>
+            </select>
+          </div>
+
+          <div className="col-md-4">
+            <select
+              className="form-select"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value)}
+            >
+              <option value="ID_ASC">Sort by ID: Low to High</option>
+              <option value="ID_DESC">Sort by ID: High to Low</option>
+              <option value="PRIORITY_HIGH_LOW">Sort by Priority: High to Low</option>
+              <option value="PRIORITY_LOW_HIGH">Sort by Priority: Low to High</option>
+              <option value="STATUS_ASC">Sort by Status: OPEN to CLOSED</option>
+              <option value="STATUS_DESC">Sort by Status: CLOSED to OPEN</option>
             </select>
           </div>
         </div>
@@ -125,8 +183,8 @@ function TicketListPage({ tickets, onViewDetails }) {
             </tr>
           </thead>
           <tbody>
-            {filteredTickets.length > 0 ? (
-              filteredTickets.map((ticket) => (
+            {sortedTickets.length > 0 ? (
+              sortedTickets.map((ticket) => (
                 <tr key={ticket.id}>
                   <td>{ticket.id}</td>
                   <td>{ticket.title}</td>
