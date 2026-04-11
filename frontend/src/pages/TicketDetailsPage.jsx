@@ -20,20 +20,88 @@ function TicketDetailsPage({
     );
   }
 
+  const getPriorityBadgeClass = (priority) => {
+    if (priority === 'High') {
+      return 'bg-danger';
+    }
+
+    if (priority === 'Medium') {
+      return 'bg-warning text-dark';
+    }
+
+    return 'bg-success';
+  };
+
+  const getStatusBadgeClass = (status) => {
+    if (status === 'OPEN') {
+      return 'bg-primary';
+    }
+
+    if (status === 'IN_PROGRESS') {
+      return 'bg-warning text-dark';
+    }
+
+    if (status === 'RESOLVED') {
+      return 'bg-success';
+    }
+
+    if (status === 'CLOSED') {
+      return 'bg-secondary';
+    }
+
+    return 'bg-dark';
+  };
+
   return (
     <div className="container mt-5">
-      <div className="card shadow p-4">
-        <h2 className="mb-4 text-primary">Ticket Details</h2>
+      <div className="card shadow border-0 mb-4">
+        <div className="card-body p-4">
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h2 className="text-primary mb-0">Ticket Details</h2>
+            <span className="badge bg-dark fs-6">Ticket #{ticket.id}</span>
+          </div>
 
-        <p><strong>ID:</strong> {ticket.id}</p>
-        <p><strong>Title:</strong> {ticket.title}</p>
-        <p><strong>Category:</strong> {ticket.category}</p>
-        <p><strong>Description:</strong> {ticket.description}</p>
-        <p><strong>Priority:</strong> {ticket.priority}</p>
-        <p><strong>Contact Details:</strong> {ticket.contactDetails}</p>
-        <p><strong>Status:</strong> {ticket.status}</p>
-        <p><strong>Assigned Technician:</strong> {ticket.assignedTechnician}</p>
-        <p><strong>Resolution Note:</strong> {ticket.resolutionNote}</p>
+          <div className="row g-4">
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100">
+                <h5 className="text-secondary mb-3">Basic Information</h5>
+                <p><strong>Title:</strong> {ticket.title}</p>
+                <p><strong>Category:</strong> {ticket.category}</p>
+                <p><strong>Contact Details:</strong> {ticket.contactDetails}</p>
+                <p>
+                  <strong>Priority:</strong>{' '}
+                  <span className={`badge ${getPriorityBadgeClass(ticket.priority)}`}>
+                    {ticket.priority}
+                  </span>
+                </p>
+                <p>
+                  <strong>Status:</strong>{' '}
+                  <span className={`badge ${getStatusBadgeClass(ticket.status)}`}>
+                    {ticket.status}
+                  </span>
+                </p>
+              </div>
+            </div>
+
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100">
+                <h5 className="text-secondary mb-3">Assignment & Resolution</h5>
+                <p><strong>Assigned Technician:</strong> {ticket.assignedTechnician}</p>
+                <p className="mb-0">
+                  <strong>Resolution Note:</strong>{' '}
+                  {ticket.resolutionNote || 'No resolution yet'}
+                </p>
+              </div>
+            </div>
+
+            <div className="col-12">
+              <div className="border rounded p-3">
+                <h5 className="text-secondary mb-3">Issue Description</h5>
+                <p className="mb-0">{ticket.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <CommentsSection
