@@ -9,6 +9,8 @@ function CreateTicketPage({ onAddTicket }) {
     contactDetails: '',
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -16,10 +18,46 @@ function CreateTicketPage({ onAddTicket }) {
       ...ticketData,
       [name]: value,
     });
+
+    setErrors({
+      ...errors,
+      [name]: '',
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (ticketData.title.trim() === '') {
+      newErrors.title = 'Title is required.';
+    }
+
+    if (ticketData.category.trim() === '') {
+      newErrors.category = 'Category is required.';
+    }
+
+    if (ticketData.description.trim() === '') {
+      newErrors.description = 'Description is required.';
+    }
+
+    if (ticketData.contactDetails.trim() === '') {
+      newErrors.contactDetails = 'Contact details are required.';
+    }
+
+    setErrors(newErrors);
+
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
+    const isValid = validateForm();
+
+    if (!isValid) {
+      alert('Please fill in all required fields.');
+      return;
+    }
 
     onAddTicket(ticketData);
 
@@ -32,6 +70,8 @@ function CreateTicketPage({ onAddTicket }) {
       priority: 'Low',
       contactDetails: '',
     });
+
+    setErrors({});
   };
 
   return (
@@ -45,11 +85,14 @@ function CreateTicketPage({ onAddTicket }) {
             <input
               type="text"
               name="title"
-              className="form-control"
+              className={`form-control ${errors.title ? 'is-invalid' : ''}`}
               placeholder="Enter ticket title"
               value={ticketData.title}
               onChange={handleChange}
             />
+            {errors.title && (
+              <div className="invalid-feedback">{errors.title}</div>
+            )}
           </div>
 
           <div className="mb-3">
@@ -57,23 +100,29 @@ function CreateTicketPage({ onAddTicket }) {
             <input
               type="text"
               name="category"
-              className="form-control"
+              className={`form-control ${errors.category ? 'is-invalid' : ''}`}
               placeholder="Enter category"
               value={ticketData.category}
               onChange={handleChange}
             />
+            {errors.category && (
+              <div className="invalid-feedback">{errors.category}</div>
+            )}
           </div>
 
           <div className="mb-3">
             <label className="form-label">Description</label>
             <textarea
               name="description"
-              className="form-control"
+              className={`form-control ${errors.description ? 'is-invalid' : ''}`}
               rows="4"
               placeholder="Describe the issue"
               value={ticketData.description}
               onChange={handleChange}
             ></textarea>
+            {errors.description && (
+              <div className="invalid-feedback">{errors.description}</div>
+            )}
           </div>
 
           <div className="mb-3">
@@ -95,11 +144,14 @@ function CreateTicketPage({ onAddTicket }) {
             <input
               type="text"
               name="contactDetails"
-              className="form-control"
+              className={`form-control ${errors.contactDetails ? 'is-invalid' : ''}`}
               placeholder="Enter contact details"
               value={ticketData.contactDetails}
               onChange={handleChange}
             />
+            {errors.contactDetails && (
+              <div className="invalid-feedback">{errors.contactDetails}</div>
+            )}
           </div>
 
           <button type="submit" className="btn btn-success">
