@@ -54,6 +54,13 @@ function App() {
     fetchAllTickets();
   }, []);
 
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }, [currentPage]);
+
   const getNavButtonClass = (pageName, defaultClass) => {
     return currentPage === pageName
       ? `${defaultClass} border border-light border-2`
