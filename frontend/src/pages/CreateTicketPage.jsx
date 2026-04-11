@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function CreateTicketPage() {
+function CreateTicketPage({ onAddTicket }) {
   const [ticketData, setTicketData] = useState({
     title: '',
     category: '',
@@ -21,7 +21,8 @@ function CreateTicketPage() {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    console.log('Ticket Submitted:', ticketData);
+    onAddTicket(ticketData);
+
     alert('Ticket submitted successfully!');
 
     setTicketData({

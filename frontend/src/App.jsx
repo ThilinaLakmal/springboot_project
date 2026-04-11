@@ -6,6 +6,44 @@ import TicketDetailsPage from './pages/TicketDetailsPage';
 function App() {
   const [currentPage, setCurrentPage] = useState('create');
 
+  const [tickets, setTickets] = useState([
+    {
+      id: 1,
+      title: 'WiFi not working',
+      category: 'Network',
+      description: 'The WiFi connection in Lab 2 is not working properly.',
+      priority: 'High',
+      contactDetails: 'thilini@example.com',
+      status: 'OPEN',
+      assignedTechnician: 'Not Assigned',
+      resolutionNote: 'No resolution yet',
+    },
+    {
+      id: 2,
+      title: 'Projector issue',
+      category: 'Hardware',
+      description: 'The classroom projector is not turning on.',
+      priority: 'Medium',
+      contactDetails: 'thilini@example.com',
+      status: 'IN_PROGRESS',
+      assignedTechnician: 'Thilin Abeykoon',
+      resolutionNote: 'Checking power cable',
+    },
+  ]);
+
+  const addNewTicket = (newTicket) => {
+    const ticketWithId = {
+      ...newTicket,
+      id: tickets.length + 1,
+      status: 'OPEN',
+      assignedTechnician: 'Not Assigned',
+      resolutionNote: 'No resolution yet',
+    };
+
+    setTickets([...tickets, ticketWithId]);
+    setCurrentPage('list');
+  };
+
   return (
     <div>
       <nav className="navbar navbar-dark bg-dark px-3">
@@ -34,8 +72,8 @@ function App() {
         </div>
       </nav>
 
-      {currentPage === 'create' && <CreateTicketPage />}
-      {currentPage === 'list' && <TicketListPage />}
+      {currentPage === 'create' && <CreateTicketPage onAddTicket={addNewTicket} />}
+      {currentPage === 'list' && <TicketListPage tickets={tickets} />}
       {currentPage === 'details' && <TicketDetailsPage />}
     </div>
   );

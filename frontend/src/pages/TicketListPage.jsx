@@ -1,28 +1,4 @@
-function TicketListPage() {
-  const tickets = [
-    {
-      id: 1,
-      title: "WiFi not working",
-      category: "Network",
-      priority: "High",
-      status: "OPEN",
-    },
-    {
-      id: 2,
-      title: "Projector issue",
-      category: "Hardware",
-      priority: "Medium",
-      status: "IN_PROGRESS",
-    },
-    {
-      id: 3,
-      title: "Email login problem",
-      category: "Software",
-      priority: "Low",
-      status: "RESOLVED",
-    },
-  ];
-
+function TicketListPage({ tickets }) {
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
