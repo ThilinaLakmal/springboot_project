@@ -2,6 +2,8 @@ package com.example.backend.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -31,6 +33,22 @@ public class Ticket {
     @Column(length = 2000)
     private String resolutionNote;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "ticket_comments",
+            joinColumns = @JoinColumn(name = "ticket_id")
+    )
+    @Column(name = "comment_text", length = 1000)
+    private List<String> comments = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+            name = "ticket_attachments",
+            joinColumns = @JoinColumn(name = "ticket_id")
+    )
+    @Column(name = "attachment_name")
+    private List<String> attachments = new ArrayList<>();
+
     public Ticket() {
     }
 
@@ -50,6 +68,14 @@ public class Ticket {
 
         if (this.resolutionNote == null || this.resolutionNote.isBlank()) {
             this.resolutionNote = "No resolution yet";
+        }
+
+        if (this.comments == null) {
+            this.comments = new ArrayList<>();
+        }
+
+        if (this.attachments == null) {
+            this.attachments = new ArrayList<>();
         }
     }
 
@@ -131,5 +157,21 @@ public class Ticket {
 
     public void setResolutionNote(String resolutionNote) {
         this.resolutionNote = resolutionNote;
+    }
+
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
+
+    public List<String> getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(List<String> attachments) {
+        this.attachments = attachments;
     }
 }

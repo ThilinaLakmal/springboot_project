@@ -4,6 +4,7 @@ import com.example.backend.model.Ticket;
 import com.example.backend.repository.TicketRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,6 +49,48 @@ public class TicketService {
         if (optionalTicket.isPresent()) {
             Ticket ticket = optionalTicket.get();
             ticket.setAssignedTechnician(technicianName);
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Ticket> addComment(Long id, String commentText) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+
+            if (ticket.getComments() == null) {
+                ticket.setComments(new ArrayList<>());
+            }
+
+            ticket.getComments().add(commentText);
+
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Ticket> addAttachment(Long id, String attachmentFileName) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+
+            if (ticket.getAttachments() == null) {
+                ticket.setAttachments(new ArrayList<>());
+            }
+
+            if (ticket.getAttachments().size() >= 3) {
+                throw new IllegalStateException("Maximum 3 attachments allowed");
+            }
+
+            ticket.getAttachments().add(attachmentFileName);
+
             Ticket updatedTicket = ticketRepository.save(ticket);
             return Optional.of(updatedTicket);
         }

@@ -75,4 +75,40 @@ public class TicketController {
                 .<ResponseEntity<?>>map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND));
     }
+
+    @PostMapping("/{id}/comments")
+    public ResponseEntity<?> addComment(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> requestBody
+    ) {
+        String commentText = requestBody.get("comment");
+
+        if (commentText == null || commentText.isBlank()) {
+            return new ResponseEntity<>("Comment is required", HttpStatus.BAD_REQUEST);
+        }
+
+        return ticketService.addComment(id, commentText)
+                .<ResponseEntity<?>>map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND));
+    }
+
+    @PostMapping("/{id}/attachments")
+    public ResponseEntity<?> addAttachment(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> requestBody
+    ) {
+        String attachmentFileName = requestBody.get("attachmentFileName");
+
+        if (attachmentFileName == null || attachmentFileName.isBlank()) {
+            return new ResponseEntity<>("Attachment file name is required", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            return ticketService.addAttachment(id, attachmentFileName)
+                    .<ResponseEntity<?>>map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND));
+        } catch (IllegalStateException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }
