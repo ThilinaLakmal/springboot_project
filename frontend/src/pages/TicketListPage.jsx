@@ -54,10 +54,25 @@ function TicketListPage({ tickets, onViewDetails }) {
     return 'bg-dark';
   };
 
+  const handleClearFilters = () => {
+    setSearchText('');
+    setPriorityFilter('All');
+    setStatusFilter('All');
+  };
+
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
-        <h2 className="mb-4 text-primary">All Incident Tickets</h2>
+        <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+          <h2 className="text-primary mb-0">All Incident Tickets</h2>
+
+          <button
+            className="btn btn-outline-secondary"
+            onClick={handleClearFilters}
+          >
+            Clear Filters
+          </button>
+        </div>
 
         <div className="row g-3 mb-3">
           <div className="col-md-6">
