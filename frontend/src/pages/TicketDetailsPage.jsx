@@ -1,3 +1,4 @@
+import AttachmentUpload from '../components/AttachmentUpload';
 import CommentsSection from '../components/CommentsSection';
 function TicketDetailsPage() {
   const ticket = {
@@ -29,6 +30,7 @@ function TicketDetailsPage() {
       </div>
 
       <CommentsSection />
+      <AttachmentUpload />
     </div>
   );
 }
