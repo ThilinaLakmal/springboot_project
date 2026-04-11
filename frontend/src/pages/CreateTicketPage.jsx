@@ -71,11 +71,13 @@ function CreateTicketPage({ onAddTicket }) {
       return;
     }
 
-    onAddTicket(ticketData);
+    const createdTicketId = onAddTicket(ticketData);
 
     setTicketData(initialFormData);
     setErrors({});
-    setSuccessMessage('Ticket submitted successfully.');
+    setSuccessMessage(
+      `Ticket submitted successfully. New Ticket ID: ${createdTicketId}`
+    );
   };
 
   return (

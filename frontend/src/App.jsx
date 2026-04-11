@@ -70,10 +70,11 @@ function App() {
 
   const addNewTicket = (newTicket) => {
     const { attachmentFileName, ...ticketFields } = newTicket;
+    const newTicketId = tickets.length + 1;
 
     const ticketWithId = {
       ...ticketFields,
-      id: tickets.length + 1,
+      id: newTicketId,
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
@@ -82,6 +83,8 @@ function App() {
     };
 
     setTickets([...tickets, ticketWithId]);
+
+    return newTicketId;
   };
 
   const handleUpdateStatus = (ticketId, newStatus, newResolutionNote) => {
