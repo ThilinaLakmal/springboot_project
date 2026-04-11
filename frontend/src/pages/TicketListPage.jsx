@@ -121,6 +121,20 @@ function TicketListPage({ tickets, onViewDetails }) {
     setSortBy('ID_ASC');
   };
 
+  const getSortLabel = () => {
+    if (sortBy === 'ID_ASC') return 'ID: Low to High';
+    if (sortBy === 'ID_DESC') return 'ID: High to Low';
+    if (sortBy === 'PRIORITY_HIGH_LOW') return 'Priority: High to Low';
+    if (sortBy === 'PRIORITY_LOW_HIGH') return 'Priority: Low to High';
+    if (sortBy === 'STATUS_ASC') return 'Status: OPEN to CLOSED';
+    if (sortBy === 'STATUS_DESC') return 'Status: CLOSED to OPEN';
+    if (sortBy === 'CREATED_NEWEST') return 'Created Time: Newest First';
+    if (sortBy === 'CREATED_OLDEST') return 'Created Time: Oldest First';
+    return 'Not selected';
+  };
+
+  const reportGeneratedAt = new Date().toLocaleString();
+
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
@@ -224,6 +238,43 @@ function TicketListPage({ tickets, onViewDetails }) {
             <div className="border rounded p-3 text-center">
               <span className="badge bg-secondary mb-2">CLOSED</span>
               <div className="fw-bold fs-5">{closedCount}</div>
+            </div>
+          </div>
+        </div>
+
+        <div className="card border mb-4 bg-light">
+          <div className="card-body">
+            <h5 className="text-dark mb-3">Export-Style Summary</h5>
+
+            <div className="row g-3">
+              <div className="col-md-6">
+                <div className="border rounded p-3 h-100 bg-white">
+                  <p className="mb-2">
+                    <strong>Search Text:</strong>{' '}
+                    {searchText.trim() !== '' ? searchText : 'None'}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Priority Filter:</strong> {priorityFilter}
+                  </p>
+                  <p className="mb-0">
+                    <strong>Status Filter:</strong> {statusFilter}
+                  </p>
+                </div>
+              </div>
+
+              <div className="col-md-6">
+                <div className="border rounded p-3 h-100 bg-white">
+                  <p className="mb-2">
+                    <strong>Sort By:</strong> {getSortLabel()}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Filtered Results:</strong> {sortedTickets.length}
+                  </p>
+                  <p className="mb-0">
+                    <strong>Generated At:</strong> {reportGeneratedAt}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
