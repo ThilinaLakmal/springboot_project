@@ -27,4 +27,31 @@ public class TicketService {
     public Optional<Ticket> getTicketById(Long id) {
         return ticketRepository.findById(id);
     }
+
+    public Optional<Ticket> updateTicketStatus(Long id, String status, String resolutionNote) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+            ticket.setStatus(status);
+            ticket.setResolutionNote(resolutionNote);
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Ticket> assignTechnician(Long id, String technicianName) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+            ticket.setAssignedTechnician(technicianName);
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
 }
