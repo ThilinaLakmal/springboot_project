@@ -1,3 +1,4 @@
+import TechnicianAssign from '../components/TechnicianAssign';
 import StatusUpdate from '../components/StatusUpdate';
 import AttachmentUpload from '../components/AttachmentUpload';
 import CommentsSection from '../components/CommentsSection';
@@ -33,6 +34,7 @@ function TicketDetailsPage() {
       <CommentsSection />
       <AttachmentUpload />
       <StatusUpdate />
+      <TechnicianAssign />
     </div>
   );
 }
