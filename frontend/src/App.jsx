@@ -244,7 +244,7 @@ function App() {
   };
 
   return (
-    <div>
+    <div className="bg-light min-vh-100">
       <nav className="navbar navbar-dark bg-dark px-3 py-3">
         <div className="container-fluid">
           <span className="navbar-brand mb-0 h1">Incident Management System</span>
@@ -344,6 +344,14 @@ function App() {
           onDeleteAttachment={handleDeleteAttachment}
         />
       )}
+
+      <footer className="mt-5 py-4 bg-dark text-white">
+        <div className="container text-center">
+          <small>
+            Incident Management System • Member 3 Frontend Demo • Built with React and Bootstrap
+          </small>
+        </div>
+      </footer>
     </div>
   );
 }
