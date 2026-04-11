@@ -1,3 +1,4 @@
+import CommentsSection from '../components/CommentsSection';
 function TicketDetailsPage() {
   const ticket = {
     id: 1,
@@ -26,6 +27,8 @@ function TicketDetailsPage() {
         <p><strong>Assigned Technician:</strong> {ticket.assignedTechnician}</p>
         <p><strong>Resolution Note:</strong> {ticket.resolutionNote}</p>
       </div>
+
+      <CommentsSection />
     </div>
   );
 }
