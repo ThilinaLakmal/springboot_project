@@ -171,6 +171,13 @@ function TicketListPage({ tickets, onViewDetails }) {
           </div>
         </div>
 
+        <div className="mb-3">
+          <div className="alert alert-light border mb-0">
+            Showing <strong>{sortedTickets.length}</strong> result(s) out of{' '}
+            <strong>{tickets.length}</strong> total ticket(s).
+          </div>
+        </div>
+
         <table className="table table-bordered table-striped align-middle">
           <thead>
             <tr>
