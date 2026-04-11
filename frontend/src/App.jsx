@@ -59,6 +59,15 @@ function App() {
       : defaultClass;
   };
 
+  const totalTickets = tickets.length;
+  const openTickets = tickets.filter((ticket) => ticket.status === 'OPEN').length;
+  const inProgressTickets = tickets.filter(
+    (ticket) => ticket.status === 'IN_PROGRESS'
+  ).length;
+  const resolvedTickets = tickets.filter(
+    (ticket) => ticket.status === 'RESOLVED'
+  ).length;
+
   const addNewTicket = (newTicket) => {
     const ticketWithId = {
       ...newTicket,
@@ -243,6 +252,46 @@ function App() {
           </div>
         </div>
       </nav>
+
+      <div className="container mt-4">
+        <div className="row g-3">
+          <div className="col-md-3">
+            <div className="card shadow border-0 text-center h-100">
+              <div className="card-body">
+                <h6 className="text-muted">Total Tickets</h6>
+                <h2 className="text-dark mb-0">{totalTickets}</h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card shadow border-0 text-center h-100">
+              <div className="card-body">
+                <h6 className="text-muted">Open Tickets</h6>
+                <h2 className="text-primary mb-0">{openTickets}</h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card shadow border-0 text-center h-100">
+              <div className="card-body">
+                <h6 className="text-muted">In Progress</h6>
+                <h2 className="text-warning mb-0">{inProgressTickets}</h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="card shadow border-0 text-center h-100">
+              <div className="card-body">
+                <h6 className="text-muted">Resolved Tickets</h6>
+                <h2 className="text-success mb-0">{resolvedTickets}</h2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {currentPage === 'create' && (
         <CreateTicketPage onAddTicket={addNewTicket} />
