@@ -58,9 +58,15 @@ function TicketDetailsPage({
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h2 className="text-primary mb-0">Ticket Details</h2>
 
-        <button className="btn btn-outline-primary" onClick={onBackToList}>
-          Back to Ticket List
-        </button>
+        <div className="d-flex gap-2 flex-wrap">
+          <button className="btn btn-outline-secondary" onClick={() => window.print()}>
+            Print Summary
+          </button>
+
+          <button className="btn btn-outline-primary" onClick={onBackToList}>
+            Back to Ticket List
+          </button>
+        </div>
       </div>
 
       <div className="card shadow border-0 mb-4">
@@ -106,6 +112,42 @@ function TicketDetailsPage({
               <div className="border rounded p-3">
                 <h5 className="text-secondary mb-3">Issue Description</h5>
                 <p className="mb-0">{ticket.description}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="card shadow-sm border mb-4 bg-white">
+        <div className="card-body p-4">
+          <h4 className="text-dark mb-3">Print-Friendly Ticket Summary</h4>
+
+          <div className="row g-3">
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100">
+                <p className="mb-2"><strong>Ticket ID:</strong> {ticket.id}</p>
+                <p className="mb-2"><strong>Title:</strong> {ticket.title}</p>
+                <p className="mb-2"><strong>Category:</strong> {ticket.category}</p>
+                <p className="mb-0"><strong>Contact:</strong> {ticket.contactDetails}</p>
+              </div>
+            </div>
+
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100">
+                <p className="mb-2"><strong>Priority:</strong> {ticket.priority}</p>
+                <p className="mb-2"><strong>Status:</strong> {ticket.status}</p>
+                <p className="mb-2"><strong>Technician:</strong> {ticket.assignedTechnician}</p>
+                <p className="mb-0"><strong>Attachments:</strong> {ticket.attachments.length}</p>
+              </div>
+            </div>
+
+            <div className="col-12">
+              <div className="border rounded p-3">
+                <p className="mb-2"><strong>Description:</strong></p>
+                <p className="mb-3">{ticket.description}</p>
+
+                <p className="mb-2"><strong>Resolution Note:</strong></p>
+                <p className="mb-0">{ticket.resolutionNote || 'No resolution yet'}</p>
               </div>
             </div>
           </div>
