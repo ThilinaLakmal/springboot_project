@@ -1,3 +1,4 @@
+import StatusUpdate from '../components/StatusUpdate';
 import AttachmentUpload from '../components/AttachmentUpload';
 import CommentsSection from '../components/CommentsSection';
 function TicketDetailsPage() {
@@ -7,7 +8,7 @@ function TicketDetailsPage() {
     category: "Network",
     description: "The WiFi connection in Lab 2 is not working properly.",
     priority: "High",
-    contactDetails: "kavin@example.com",
+    contactDetails: "thilini@example.com",
     status: "OPEN",
     assignedTechnician: "Not Assigned",
     resolutionNote: "No resolution yet"
@@ -31,6 +32,7 @@ function TicketDetailsPage() {
 
       <CommentsSection />
       <AttachmentUpload />
+      <StatusUpdate />
     </div>
   );
 }

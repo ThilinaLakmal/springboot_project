@@ -1,6 +1,6 @@
 function CommentsSection() {
   const comments = [
-    { id: 1, user: "Kavin", message: "Please check this issue soon." },
+    { id: 1, user: "thilini", message: "Please check this issue soon." },
     { id: 2, user: "Technician", message: "I am currently investigating this problem." },
   ];
 
