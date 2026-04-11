@@ -97,14 +97,20 @@ function CreateTicketPage({ onAddTicket }) {
 
           <div className="mb-3">
             <label className="form-label">Category</label>
-            <input
-              type="text"
+            <select
               name="category"
-              className={`form-control ${errors.category ? 'is-invalid' : ''}`}
-              placeholder="Enter category"
+              className={`form-select ${errors.category ? 'is-invalid' : ''}`}
               value={ticketData.category}
               onChange={handleChange}
-            />
+            >
+              <option value="">Select category</option>
+              <option value="Network">Network</option>
+              <option value="Hardware">Hardware</option>
+              <option value="Software">Software</option>
+              <option value="Account">Account</option>
+              <option value="Security">Security</option>
+              <option value="Other">Other</option>
+            </select>
             {errors.category && (
               <div className="invalid-feedback">{errors.category}</div>
             )}
