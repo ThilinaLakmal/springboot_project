@@ -1,15 +1,16 @@
 import { useState } from 'react';
 
 function CreateTicketPage({ onAddTicket }) {
-  const [ticketData, setTicketData] = useState({
+  const initialFormData = {
     title: '',
     category: '',
     description: '',
     priority: 'Low',
     contactDetails: '',
     attachmentFileName: '',
-  });
+  };
 
+  const [ticketData, setTicketData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
 
   const handleChange = (event) => {
@@ -50,6 +51,11 @@ function CreateTicketPage({ onAddTicket }) {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleReset = () => {
+    setTicketData(initialFormData);
+    setErrors({});
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -64,15 +70,7 @@ function CreateTicketPage({ onAddTicket }) {
 
     alert('Ticket submitted successfully!');
 
-    setTicketData({
-      title: '',
-      category: '',
-      description: '',
-      priority: 'Low',
-      contactDetails: '',
-      attachmentFileName: '',
-    });
-
+    setTicketData(initialFormData);
     setErrors({});
   };
 
@@ -177,9 +175,19 @@ function CreateTicketPage({ onAddTicket }) {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-success">
-            Submit Ticket
-          </button>
+          <div className="d-flex gap-2">
+            <button type="submit" className="btn btn-success">
+              Submit Ticket
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleReset}
+            >
+              Reset Form
+            </button>
+          </div>
         </form>
       </div>
     </div>
