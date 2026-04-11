@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function AttachmentUpload({ ticket, onAddAttachment }) {
+function AttachmentUpload({ ticket, onAddAttachment, onDeleteAttachment }) {
   const [fileName, setFileName] = useState('');
 
   const handleSubmit = (event) => {
@@ -13,6 +13,11 @@ function AttachmentUpload({ ticket, onAddAttachment }) {
 
     onAddAttachment(ticket.id, fileName);
     setFileName('');
+  };
+
+  const handleDelete = (fileNameToDelete) => {
+    onDeleteAttachment(ticket.id, fileNameToDelete);
+    alert('Attachment removed successfully!');
   };
 
   return (
@@ -44,8 +49,17 @@ function AttachmentUpload({ ticket, onAddAttachment }) {
         <ul className="list-group">
           {ticket.attachments.length > 0 ? (
             ticket.attachments.map((file, index) => (
-              <li key={index} className="list-group-item">
-                {file}
+              <li
+                key={index}
+                className="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>{file}</span>
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDelete(file)}
+                >
+                  Remove
+                </button>
               </li>
             ))
           ) : (

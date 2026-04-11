@@ -10,6 +10,7 @@ function TicketDetailsPage({
   onAddComment,
   onDeleteComment,
   onAddAttachment,
+  onDeleteAttachment,
 }) {
   if (!ticket) {
     return (
@@ -41,7 +42,11 @@ function TicketDetailsPage({
         onDeleteComment={onDeleteComment}
       />
 
-      <AttachmentUpload ticket={ticket} onAddAttachment={onAddAttachment} />
+      <AttachmentUpload
+        ticket={ticket}
+        onAddAttachment={onAddAttachment}
+        onDeleteAttachment={onDeleteAttachment}
+      />
 
       <StatusUpdate ticket={ticket} onUpdateStatus={onUpdateStatus} />
 

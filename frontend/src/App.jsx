@@ -181,6 +181,27 @@ function App() {
     setSelectedTicket(updatedSelectedTicket);
   };
 
+  const handleDeleteAttachment = (ticketId, fileName) => {
+    const updatedTickets = tickets.map((ticket) => {
+      if (ticket.id === ticketId) {
+        return {
+          ...ticket,
+          attachments: ticket.attachments.filter((file) => file !== fileName),
+        };
+      }
+
+      return ticket;
+    });
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
   const handleViewDetails = (ticket) => {
     setSelectedTicket(ticket);
     setCurrentPage('details');
@@ -230,6 +251,7 @@ function App() {
           onAddComment={handleAddComment}
           onDeleteComment={handleDeleteComment}
           onAddAttachment={handleAddAttachment}
+          onDeleteAttachment={handleDeleteAttachment}
         />
       )}
     </div>
