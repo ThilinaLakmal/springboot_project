@@ -18,6 +18,13 @@ function App() {
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
+      comments: [
+        {
+          id: 1,
+          user: 'thilini',
+          message: 'Please check this issue soon.',
+        },
+      ],
     },
     {
       id: 2,
@@ -29,6 +36,13 @@ function App() {
       status: 'IN_PROGRESS',
       assignedTechnician: 'Thilin Abeykoon',
       resolutionNote: 'Checking power cable',
+      comments: [
+        {
+          id: 1,
+          user: 'Technician',
+          message: 'I am checking the projector now.',
+        },
+      ],
     },
   ]);
 
@@ -39,6 +53,7 @@ function App() {
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
+      comments: [],
     };
 
     setTickets([...tickets, ticketWithId]);
@@ -74,6 +89,33 @@ function App() {
           }
         : ticket
     );
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
+  const handleAddComment = (ticketId, commentText) => {
+    const updatedTickets = tickets.map((ticket) => {
+      if (ticket.id === ticketId) {
+        const newComment = {
+          id: ticket.comments.length + 1,
+          user: 'thilini',
+          message: commentText,
+        };
+
+        return {
+          ...ticket,
+          comments: [...ticket.comments, newComment],
+        };
+      }
+
+      return ticket;
+    });
 
     setTickets(updatedTickets);
 
@@ -130,6 +172,7 @@ function App() {
           ticket={selectedTicket}
           onUpdateStatus={handleUpdateStatus}
           onAssignTechnician={handleAssignTechnician}
+          onAddComment={handleAddComment}
         />
       )}
     </div>

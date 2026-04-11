@@ -3,7 +3,12 @@ import AttachmentUpload from '../components/AttachmentUpload';
 import StatusUpdate from '../components/StatusUpdate';
 import TechnicianAssign from '../components/TechnicianAssign';
 
-function TicketDetailsPage({ ticket, onUpdateStatus, onAssignTechnician }) {
+function TicketDetailsPage({
+  ticket,
+  onUpdateStatus,
+  onAssignTechnician,
+  onAddComment,
+}) {
   if (!ticket) {
     return (
       <div className="container mt-5">
@@ -28,7 +33,7 @@ function TicketDetailsPage({ ticket, onUpdateStatus, onAssignTechnician }) {
         <p><strong>Resolution Note:</strong> {ticket.resolutionNote}</p>
       </div>
 
-      <CommentsSection />
+      <CommentsSection ticket={ticket} onAddComment={onAddComment} />
       <AttachmentUpload />
       <StatusUpdate ticket={ticket} onUpdateStatus={onUpdateStatus} />
       <TechnicianAssign
