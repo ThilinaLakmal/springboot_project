@@ -69,14 +69,16 @@ function App() {
   ).length;
 
   const addNewTicket = (newTicket) => {
+    const { attachmentFileName, ...ticketFields } = newTicket;
+
     const ticketWithId = {
-      ...newTicket,
+      ...ticketFields,
       id: tickets.length + 1,
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
       comments: [],
-      attachments: [],
+      attachments: attachmentFileName.trim() !== '' ? [attachmentFileName] : [],
     };
 
     setTickets([...tickets, ticketWithId]);

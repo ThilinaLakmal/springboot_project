@@ -7,6 +7,7 @@ function CreateTicketPage({ onAddTicket }) {
     description: '',
     priority: 'Low',
     contactDetails: '',
+    attachmentFileName: '',
   });
 
   const [errors, setErrors] = useState({});
@@ -69,6 +70,7 @@ function CreateTicketPage({ onAddTicket }) {
       description: '',
       priority: 'Low',
       contactDetails: '',
+      attachmentFileName: '',
     });
 
     setErrors({});
@@ -158,6 +160,21 @@ function CreateTicketPage({ onAddTicket }) {
             {errors.contactDetails && (
               <div className="invalid-feedback">{errors.contactDetails}</div>
             )}
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Initial Attachment File Name</label>
+            <input
+              type="text"
+              name="attachmentFileName"
+              className="form-control"
+              placeholder="Enter file name if available"
+              value={ticketData.attachmentFileName}
+              onChange={handleChange}
+            />
+            <div className="form-text">
+              This is optional. You can also add more attachments later in Ticket Details.
+            </div>
           </div>
 
           <button type="submit" className="btn btn-success">
