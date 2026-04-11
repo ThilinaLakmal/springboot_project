@@ -3,6 +3,7 @@ import { useState } from 'react';
 function TicketListPage({ tickets, onViewDetails }) {
   const [searchText, setSearchText] = useState('');
   const [priorityFilter, setPriorityFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
 
   const filteredTickets = tickets.filter((ticket) => {
     const searchValue = searchText.toLowerCase();
@@ -15,7 +16,10 @@ function TicketListPage({ tickets, onViewDetails }) {
     const matchesPriority =
       priorityFilter === 'All' || ticket.priority === priorityFilter;
 
-    return matchesSearch && matchesPriority;
+    const matchesStatus =
+      statusFilter === 'All' || ticket.status === statusFilter;
+
+    return matchesSearch && matchesPriority && matchesStatus;
   });
 
   const getPriorityBadgeClass = (priority) => {
@@ -56,7 +60,7 @@ function TicketListPage({ tickets, onViewDetails }) {
         <h2 className="mb-4 text-primary">All Incident Tickets</h2>
 
         <div className="row g-3 mb-3">
-          <div className="col-md-8">
+          <div className="col-md-6">
             <input
               type="text"
               className="form-control"
@@ -66,7 +70,7 @@ function TicketListPage({ tickets, onViewDetails }) {
             />
           </div>
 
-          <div className="col-md-4">
+          <div className="col-md-3">
             <select
               className="form-select"
               value={priorityFilter}
@@ -76,6 +80,20 @@ function TicketListPage({ tickets, onViewDetails }) {
               <option value="High">High</option>
               <option value="Medium">Medium</option>
               <option value="Low">Low</option>
+            </select>
+          </div>
+
+          <div className="col-md-3">
+            <select
+              className="form-select"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+            >
+              <option value="All">All Statuses</option>
+              <option value="OPEN">OPEN</option>
+              <option value="IN_PROGRESS">IN_PROGRESS</option>
+              <option value="RESOLVED">RESOLVED</option>
+              <option value="CLOSED">CLOSED</option>
             </select>
           </div>
         </div>
