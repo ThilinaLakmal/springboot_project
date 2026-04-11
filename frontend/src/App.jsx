@@ -1,7 +1,7 @@
-import CreateTicketPage from './pages/CreateTicketPage';
+import TicketListPage from './pages/TicketListPage';
 
 function App() {
-  return <CreateTicketPage />;
+  return <TicketListPage />;
 }
 
 export default App;
