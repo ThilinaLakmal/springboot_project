@@ -64,6 +64,15 @@ function TicketListPage({ tickets, onViewDetails }) {
     return 0;
   });
 
+  const openCount = sortedTickets.filter((ticket) => ticket.status === 'OPEN').length;
+  const inProgressCount = sortedTickets.filter(
+    (ticket) => ticket.status === 'IN_PROGRESS'
+  ).length;
+  const resolvedCount = sortedTickets.filter(
+    (ticket) => ticket.status === 'RESOLVED'
+  ).length;
+  const closedCount = sortedTickets.filter((ticket) => ticket.status === 'CLOSED').length;
+
   const getPriorityBadgeClass = (priority) => {
     if (priority === 'High') {
       return 'bg-danger';
@@ -175,6 +184,36 @@ function TicketListPage({ tickets, onViewDetails }) {
           <div className="alert alert-light border mb-0">
             Showing <strong>{sortedTickets.length}</strong> result(s) out of{' '}
             <strong>{tickets.length}</strong> total ticket(s).
+          </div>
+        </div>
+
+        <div className="row g-2 mb-4">
+          <div className="col-md-3">
+            <div className="border rounded p-3 text-center">
+              <span className="badge bg-primary mb-2">OPEN</span>
+              <div className="fw-bold fs-5">{openCount}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="border rounded p-3 text-center">
+              <span className="badge bg-warning text-dark mb-2">IN_PROGRESS</span>
+              <div className="fw-bold fs-5">{inProgressCount}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="border rounded p-3 text-center">
+              <span className="badge bg-success mb-2">RESOLVED</span>
+              <div className="fw-bold fs-5">{resolvedCount}</div>
+            </div>
+          </div>
+
+          <div className="col-md-3">
+            <div className="border rounded p-3 text-center">
+              <span className="badge bg-secondary mb-2">CLOSED</span>
+              <div className="fw-bold fs-5">{closedCount}</div>
+            </div>
           </div>
         </div>
 
