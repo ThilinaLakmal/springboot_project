@@ -24,6 +24,11 @@ function App() {
           user: 'thilini',
           message: 'Please check this issue soon.',
         },
+        {
+          id: 2,
+          user: 'Technician',
+          message: 'I am reviewing the issue now.',
+        },
       ],
       attachments: ['wifi_issue_1.jpg', 'wifi_issue_2.jpg'],
     },
@@ -129,6 +134,27 @@ function App() {
     setSelectedTicket(updatedSelectedTicket);
   };
 
+  const handleDeleteComment = (ticketId, commentId) => {
+    const updatedTickets = tickets.map((ticket) => {
+      if (ticket.id === ticketId) {
+        return {
+          ...ticket,
+          comments: ticket.comments.filter((comment) => comment.id !== commentId),
+        };
+      }
+
+      return ticket;
+    });
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
   const handleAddAttachment = (ticketId, fileName) => {
     const updatedTickets = tickets.map((ticket) => {
       if (ticket.id === ticketId) {
@@ -202,6 +228,7 @@ function App() {
           onUpdateStatus={handleUpdateStatus}
           onAssignTechnician={handleAssignTechnician}
           onAddComment={handleAddComment}
+          onDeleteComment={handleDeleteComment}
           onAddAttachment={handleAddAttachment}
         />
       )}

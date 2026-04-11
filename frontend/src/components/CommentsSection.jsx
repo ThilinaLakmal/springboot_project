@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function CommentsSection({ ticket, onAddComment }) {
+function CommentsSection({ ticket, onAddComment, onDeleteComment }) {
   const [commentText, setCommentText] = useState('');
 
   const handleSubmit = (event) => {
@@ -14,6 +14,11 @@ function CommentsSection({ ticket, onAddComment }) {
     onAddComment(ticket.id, commentText);
     setCommentText('');
     alert('Comment added successfully!');
+  };
+
+  const handleDelete = (commentId) => {
+    onDeleteComment(ticket.id, commentId);
+    alert('Comment deleted successfully!');
   };
 
   return (
@@ -39,8 +44,22 @@ function CommentsSection({ ticket, onAddComment }) {
       <ul className="list-group">
         {ticket.comments.length > 0 ? (
           ticket.comments.map((comment) => (
-            <li key={comment.id} className="list-group-item">
-              <strong>{comment.user}:</strong> {comment.message}
+            <li
+              key={comment.id}
+              className="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <strong>{comment.user}:</strong> {comment.message}
+              </div>
+
+              {comment.user === 'thilini' && (
+                <button
+                  className="btn btn-sm btn-danger"
+                  onClick={() => handleDelete(comment.id)}
+                >
+                  Delete
+                </button>
+              )}
             </li>
           ))
         ) : (

@@ -8,6 +8,7 @@ function TicketDetailsPage({
   onUpdateStatus,
   onAssignTechnician,
   onAddComment,
+  onDeleteComment,
   onAddAttachment,
 }) {
   if (!ticket) {
@@ -34,9 +35,16 @@ function TicketDetailsPage({
         <p><strong>Resolution Note:</strong> {ticket.resolutionNote}</p>
       </div>
 
-      <CommentsSection ticket={ticket} onAddComment={onAddComment} />
+      <CommentsSection
+        ticket={ticket}
+        onAddComment={onAddComment}
+        onDeleteComment={onDeleteComment}
+      />
+
       <AttachmentUpload ticket={ticket} onAddAttachment={onAddAttachment} />
+
       <StatusUpdate ticket={ticket} onUpdateStatus={onUpdateStatus} />
+
       <TechnicianAssign
         ticket={ticket}
         onAssignTechnician={onAssignTechnician}
