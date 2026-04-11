@@ -45,30 +45,49 @@ function App() {
     setCurrentPage('list');
   };
 
+  const handleUpdateStatus = (ticketId, newStatus, newResolutionNote) => {
+    const updatedTickets = tickets.map((ticket) =>
+      ticket.id === ticketId
+        ? {
+            ...ticket,
+            status: newStatus,
+            resolutionNote: newResolutionNote,
+          }
+        : ticket
+    );
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
+  const handleAssignTechnician = (ticketId, technicianName) => {
+    const updatedTickets = tickets.map((ticket) =>
+      ticket.id === ticketId
+        ? {
+            ...ticket,
+            assignedTechnician: technicianName,
+          }
+        : ticket
+    );
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
   const handleViewDetails = (ticket) => {
     setSelectedTicket(ticket);
     setCurrentPage('details');
   };
-
-  const handleUpdateStatus = (ticketId, newStatus, newResolutionNote) => {
-  const updatedTickets = tickets.map((ticket) =>
-    ticket.id === ticketId
-      ? {
-          ...ticket,
-          status: newStatus,
-          resolutionNote: newResolutionNote,
-        }
-      : ticket
-  );
-
-  setTickets(updatedTickets);
-
-  const updatedSelectedTicket = updatedTickets.find(
-    (ticket) => ticket.id === ticketId
-  );
-
-  setSelectedTicket(updatedSelectedTicket);
-};
 
   return (
     <div>
@@ -98,7 +117,9 @@ function App() {
         </div>
       </nav>
 
-      {currentPage === 'create' && <CreateTicketPage onAddTicket={addNewTicket} />}
+      {currentPage === 'create' && (
+        <CreateTicketPage onAddTicket={addNewTicket} />
+      )}
 
       {currentPage === 'list' && (
         <TicketListPage tickets={tickets} onViewDetails={handleViewDetails} />
@@ -106,9 +127,10 @@ function App() {
 
       {currentPage === 'details' && (
         <TicketDetailsPage
-  ticket={selectedTicket}
-  onUpdateStatus={handleUpdateStatus}
-/>
+          ticket={selectedTicket}
+          onUpdateStatus={handleUpdateStatus}
+          onAssignTechnician={handleAssignTechnician}
+        />
       )}
     </div>
   );

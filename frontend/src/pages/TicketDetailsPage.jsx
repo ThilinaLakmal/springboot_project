@@ -3,7 +3,7 @@ import AttachmentUpload from '../components/AttachmentUpload';
 import StatusUpdate from '../components/StatusUpdate';
 import TechnicianAssign from '../components/TechnicianAssign';
 
-function TicketDetailsPage({ ticket, onUpdateStatus }) {
+function TicketDetailsPage({ ticket, onUpdateStatus, onAssignTechnician }) {
   if (!ticket) {
     return (
       <div className="container mt-5">
@@ -31,7 +31,10 @@ function TicketDetailsPage({ ticket, onUpdateStatus }) {
       <CommentsSection />
       <AttachmentUpload />
       <StatusUpdate ticket={ticket} onUpdateStatus={onUpdateStatus} />
-      <TechnicianAssign />
+      <TechnicianAssign
+        ticket={ticket}
+        onAssignTechnician={onAssignTechnician}
+      />
     </div>
   );
 }
