@@ -111,4 +111,32 @@ public class TicketController {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping("/{id}/comments/{commentIndex}")
+    public ResponseEntity<?> deleteComment(
+            @PathVariable Long id,
+            @PathVariable int commentIndex
+    ) {
+        try {
+            return ticketService.deleteComment(id, commentIndex)
+                    .<ResponseEntity<?>>map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{id}/attachments/{attachmentIndex}")
+    public ResponseEntity<?> deleteAttachment(
+            @PathVariable Long id,
+            @PathVariable int attachmentIndex
+    ) {
+        try {
+            return ticketService.deleteAttachment(id, attachmentIndex)
+                    .<ResponseEntity<?>>map(ticket -> new ResponseEntity<>(ticket, HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>("Ticket not found", HttpStatus.NOT_FOUND));
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
 }

@@ -97,4 +97,42 @@ public class TicketService {
 
         return Optional.empty();
     }
+
+    public Optional<Ticket> deleteComment(Long id, int commentIndex) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+
+            if (ticket.getComments() == null || commentIndex < 0 || commentIndex >= ticket.getComments().size()) {
+                throw new IllegalArgumentException("Invalid comment index");
+            }
+
+            ticket.getComments().remove(commentIndex);
+
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<Ticket> deleteAttachment(Long id, int attachmentIndex) {
+        Optional<Ticket> optionalTicket = ticketRepository.findById(id);
+
+        if (optionalTicket.isPresent()) {
+            Ticket ticket = optionalTicket.get();
+
+            if (ticket.getAttachments() == null || attachmentIndex < 0 || attachmentIndex >= ticket.getAttachments().size()) {
+                throw new IllegalArgumentException("Invalid attachment index");
+            }
+
+            ticket.getAttachments().remove(attachmentIndex);
+
+            Ticket updatedTicket = ticketRepository.save(ticket);
+            return Optional.of(updatedTicket);
+        }
+
+        return Optional.empty();
+    }
 }
