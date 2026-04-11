@@ -20,6 +20,34 @@ Backend Work
 - Technician assign API
 - Status update API
 
+Ticket Fields
+- id
+- title
+- category
+- description
+- priority
+- contactDetails
+- status
+- createdBy
+- assignedTechnician
+- resolutionNote
+- createdAt
+- updatedAt
+
+Attachment Fields
+- id
+- ticketId
+- fileName
+- filePath
+
+Comment Fields
+- id
+- ticketId
+- userId
+- message
+- createdAt
+
+
 Frontend Work
 - Create Ticket Page
 - Ticket List Page
