@@ -59,7 +59,10 @@ function TicketDetailsPage({
         <h2 className="text-primary mb-0">Ticket Details</h2>
 
         <div className="d-flex gap-2 flex-wrap">
-          <button className="btn btn-outline-secondary" onClick={() => window.print()}>
+          <button
+            className="btn btn-outline-secondary"
+            onClick={() => window.print()}
+          >
             Print Summary
           </button>
 
@@ -149,6 +152,48 @@ function TicketDetailsPage({
                 <p className="mb-2"><strong>Resolution Note:</strong></p>
                 <p className="mb-0">{ticket.resolutionNote || 'No resolution yet'}</p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="row g-3 mb-4">
+        <div className="col-md-3">
+          <div className="card shadow-sm border-0 text-center h-100">
+            <div className="card-body">
+              <h6 className="text-muted">Comments</h6>
+              <h3 className="text-primary mb-0">{ticket.comments.length}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="card shadow-sm border-0 text-center h-100">
+            <div className="card-body">
+              <h6 className="text-muted">Attachments</h6>
+              <h3 className="text-success mb-0">{ticket.attachments.length}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="card shadow-sm border-0 text-center h-100">
+            <div className="card-body">
+              <h6 className="text-muted">Current Status</h6>
+              <div className="mt-2">
+                <span className={`badge fs-6 ${getStatusBadgeClass(ticket.status)}`}>
+                  {ticket.status}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-md-3">
+          <div className="card shadow-sm border-0 text-center h-100">
+            <div className="card-body">
+              <h6 className="text-muted">Technician</h6>
+              <h6 className="text-dark mb-0 mt-2">{ticket.assignedTechnician}</h6>
             </div>
           </div>
         </div>
