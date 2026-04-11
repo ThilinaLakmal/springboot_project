@@ -6,6 +6,7 @@ import TicketDetailsPage from './pages/TicketDetailsPage';
 function App() {
   const [currentPage, setCurrentPage] = useState('create');
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [showNewTicketNotice, setShowNewTicketNotice] = useState(false);
 
   const [tickets, setTickets] = useState([
     {
@@ -82,7 +83,12 @@ function App() {
       attachments: attachmentFileName.trim() !== '' ? [attachmentFileName] : [],
     };
 
-    setTickets([...tickets, ticketWithId]);
+    const updatedTickets = [...tickets, ticketWithId];
+
+    setTickets(updatedTickets);
+    setSelectedTicket(ticketWithId);
+    setShowNewTicketNotice(true);
+    setCurrentPage('details');
 
     return newTicketId;
   };
@@ -223,10 +229,12 @@ function App() {
 
   const handleViewDetails = (ticket) => {
     setSelectedTicket(ticket);
+    setShowNewTicketNotice(false);
     setCurrentPage('details');
   };
 
   const handleBackToList = () => {
+    setShowNewTicketNotice(false);
     setCurrentPage('list');
   };
 
@@ -239,21 +247,30 @@ function App() {
           <div className="d-flex flex-wrap gap-2">
             <button
               className={getNavButtonClass('create', 'btn btn-primary')}
-              onClick={() => setCurrentPage('create')}
+              onClick={() => {
+                setShowNewTicketNotice(false);
+                setCurrentPage('create');
+              }}
             >
               Create Ticket
             </button>
 
             <button
               className={getNavButtonClass('list', 'btn btn-warning')}
-              onClick={() => setCurrentPage('list')}
+              onClick={() => {
+                setShowNewTicketNotice(false);
+                setCurrentPage('list');
+              }}
             >
               View Tickets
             </button>
 
             <button
               className={getNavButtonClass('details', 'btn btn-info')}
-              onClick={() => setCurrentPage('details')}
+              onClick={() => {
+                setShowNewTicketNotice(false);
+                setCurrentPage('details');
+              }}
             >
               Ticket Details
             </button>
@@ -312,6 +329,7 @@ function App() {
       {currentPage === 'details' && (
         <TicketDetailsPage
           ticket={selectedTicket}
+          showNewTicketNotice={showNewTicketNotice}
           onBackToList={handleBackToList}
           onUpdateStatus={handleUpdateStatus}
           onAssignTechnician={handleAssignTechnician}

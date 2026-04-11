@@ -5,6 +5,7 @@ import TechnicianAssign from '../components/TechnicianAssign';
 
 function TicketDetailsPage({
   ticket,
+  showNewTicketNotice,
   onBackToList,
   onUpdateStatus,
   onAssignTechnician,
@@ -55,6 +56,12 @@ function TicketDetailsPage({
 
   return (
     <div className="container mt-5">
+      {showNewTicketNotice && (
+        <div className="alert alert-success">
+          New ticket created successfully. Ticket ID: <strong>{ticket.id}</strong>
+        </div>
+      )}
+
       <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <h2 className="text-primary mb-0">Ticket Details</h2>
 

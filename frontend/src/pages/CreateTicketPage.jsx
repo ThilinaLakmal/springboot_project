@@ -12,7 +12,6 @@ function CreateTicketPage({ onAddTicket }) {
 
   const [ticketData, setTicketData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -26,8 +25,6 @@ function CreateTicketPage({ onAddTicket }) {
       ...errors,
       [name]: '',
     });
-
-    setSuccessMessage('');
   };
 
   const validateForm = () => {
@@ -57,7 +54,6 @@ function CreateTicketPage({ onAddTicket }) {
   const handleReset = () => {
     setTicketData(initialFormData);
     setErrors({});
-    setSuccessMessage('');
   };
 
   const handleSubmit = (event) => {
@@ -66,30 +62,19 @@ function CreateTicketPage({ onAddTicket }) {
     const isValid = validateForm();
 
     if (!isValid) {
-      setSuccessMessage('');
       alert('Please fill in all required fields.');
       return;
     }
 
-    const createdTicketId = onAddTicket(ticketData);
-
+    onAddTicket(ticketData);
     setTicketData(initialFormData);
     setErrors({});
-    setSuccessMessage(
-      `Ticket submitted successfully. New Ticket ID: ${createdTicketId}`
-    );
   };
 
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
         <h2 className="mb-4 text-primary">Create Incident Ticket</h2>
-
-        {successMessage && (
-          <div className="alert alert-success" role="alert">
-            {successMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
