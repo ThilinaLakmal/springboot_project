@@ -82,7 +82,6 @@ function App() {
     };
 
     setTickets([...tickets, ticketWithId]);
-    setCurrentPage('list');
   };
 
   const handleUpdateStatus = (ticketId, newStatus, newResolutionNote) => {
