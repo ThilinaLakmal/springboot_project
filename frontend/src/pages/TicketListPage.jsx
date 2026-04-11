@@ -1,4 +1,4 @@
-function TicketListPage({ tickets }) {
+function TicketListPage({ tickets, onViewDetails }) {
   return (
     <div className="container mt-5">
       <div className="card shadow p-4">
@@ -12,6 +12,7 @@ function TicketListPage({ tickets }) {
               <th>Category</th>
               <th>Priority</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -22,6 +23,14 @@ function TicketListPage({ tickets }) {
                 <td>{ticket.category}</td>
                 <td>{ticket.priority}</td>
                 <td>{ticket.status}</td>
+                <td>
+                  <button
+                    className="btn btn-sm btn-info"
+                    onClick={() => onViewDetails(ticket)}
+                  >
+                    View Details
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

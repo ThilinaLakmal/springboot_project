@@ -5,6 +5,7 @@ import TicketDetailsPage from './pages/TicketDetailsPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('create');
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   const [tickets, setTickets] = useState([
     {
@@ -44,6 +45,11 @@ function App() {
     setCurrentPage('list');
   };
 
+  const handleViewDetails = (ticket) => {
+    setSelectedTicket(ticket);
+    setCurrentPage('details');
+  };
+
   return (
     <div>
       <nav className="navbar navbar-dark bg-dark px-3">
@@ -73,8 +79,14 @@ function App() {
       </nav>
 
       {currentPage === 'create' && <CreateTicketPage onAddTicket={addNewTicket} />}
-      {currentPage === 'list' && <TicketListPage tickets={tickets} />}
-      {currentPage === 'details' && <TicketDetailsPage />}
+
+      {currentPage === 'list' && (
+        <TicketListPage tickets={tickets} onViewDetails={handleViewDetails} />
+      )}
+
+      {currentPage === 'details' && (
+        <TicketDetailsPage ticket={selectedTicket} />
+      )}
     </div>
   );
 }

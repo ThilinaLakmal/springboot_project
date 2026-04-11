@@ -1,19 +1,16 @@
-import TechnicianAssign from '../components/TechnicianAssign';
-import StatusUpdate from '../components/StatusUpdate';
-import AttachmentUpload from '../components/AttachmentUpload';
 import CommentsSection from '../components/CommentsSection';
-function TicketDetailsPage() {
-  const ticket = {
-    id: 1,
-    title: "WiFi not working",
-    category: "Network",
-    description: "The WiFi connection in Lab 2 is not working properly.",
-    priority: "High",
-    contactDetails: "thilini@example.com",
-    status: "OPEN",
-    assignedTechnician: "Not Assigned",
-    resolutionNote: "No resolution yet"
-  };
+import AttachmentUpload from '../components/AttachmentUpload';
+import StatusUpdate from '../components/StatusUpdate';
+import TechnicianAssign from '../components/TechnicianAssign';
+
+function TicketDetailsPage({ ticket }) {
+  if (!ticket) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-warning">No ticket selected.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">
