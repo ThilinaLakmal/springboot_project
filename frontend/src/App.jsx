@@ -226,6 +226,10 @@ function App() {
     setCurrentPage('details');
   };
 
+  const handleBackToList = () => {
+    setCurrentPage('list');
+  };
+
   return (
     <div>
       <nav className="navbar navbar-dark bg-dark px-3 py-3">
@@ -308,6 +312,7 @@ function App() {
       {currentPage === 'details' && (
         <TicketDetailsPage
           ticket={selectedTicket}
+          onBackToList={handleBackToList}
           onUpdateStatus={handleUpdateStatus}
           onAssignTechnician={handleAssignTechnician}
           onAddComment={handleAddComment}

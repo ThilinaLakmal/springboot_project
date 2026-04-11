@@ -5,6 +5,7 @@ import TechnicianAssign from '../components/TechnicianAssign';
 
 function TicketDetailsPage({
   ticket,
+  onBackToList,
   onUpdateStatus,
   onAssignTechnician,
   onAddComment,
@@ -54,10 +55,18 @@ function TicketDetailsPage({
 
   return (
     <div className="container mt-5">
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 className="text-primary mb-0">Ticket Details</h2>
+
+        <button className="btn btn-outline-primary" onClick={onBackToList}>
+          Back to Ticket List
+        </button>
+      </div>
+
       <div className="card shadow border-0 mb-4">
         <div className="card-body p-4">
-          <div className="d-flex justify-content-between align-items-center mb-4">
-            <h2 className="text-primary mb-0">Ticket Details</h2>
+          <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+            <h4 className="mb-0 text-dark">{ticket.title}</h4>
             <span className="badge bg-dark fs-6">Ticket #{ticket.id}</span>
           </div>
 
@@ -65,7 +74,6 @@ function TicketDetailsPage({
             <div className="col-md-6">
               <div className="border rounded p-3 h-100">
                 <h5 className="text-secondary mb-3">Basic Information</h5>
-                <p><strong>Title:</strong> {ticket.title}</p>
                 <p><strong>Category:</strong> {ticket.category}</p>
                 <p><strong>Contact Details:</strong> {ticket.contactDetails}</p>
                 <p>
