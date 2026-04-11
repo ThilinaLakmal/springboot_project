@@ -92,6 +92,7 @@ function TicketDetailsPage({
                 <h5 className="text-secondary mb-3">Basic Information</h5>
                 <p><strong>Category:</strong> {ticket.category}</p>
                 <p><strong>Contact Details:</strong> {ticket.contactDetails}</p>
+                <p><strong>Created At:</strong> {ticket.createdAt}</p>
                 <p>
                   <strong>Priority:</strong>{' '}
                   <span className={`badge ${getPriorityBadgeClass(ticket.priority)}`}>
@@ -138,6 +139,7 @@ function TicketDetailsPage({
                 <p className="mb-2"><strong>Ticket ID:</strong> {ticket.id}</p>
                 <p className="mb-2"><strong>Title:</strong> {ticket.title}</p>
                 <p className="mb-2"><strong>Category:</strong> {ticket.category}</p>
+                <p className="mb-2"><strong>Created At:</strong> {ticket.createdAt}</p>
                 <p className="mb-0"><strong>Contact:</strong> {ticket.contactDetails}</p>
               </div>
             </div>

@@ -16,6 +16,7 @@ function App() {
       description: 'The WiFi connection in Lab 2 is not working properly.',
       priority: 'High',
       contactDetails: 'thilini@example.com',
+      createdAt: '2026-04-11 09:15 AM',
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
@@ -40,6 +41,7 @@ function App() {
       description: 'The classroom projector is not turning on.',
       priority: 'Medium',
       contactDetails: 'thilini@example.com',
+      createdAt: '2026-04-11 10:30 AM',
       status: 'IN_PROGRESS',
       assignedTechnician: 'Thilin Abeykoon',
       resolutionNote: 'Checking power cable',
@@ -72,10 +74,13 @@ function App() {
   const addNewTicket = (newTicket) => {
     const { attachmentFileName, ...ticketFields } = newTicket;
     const newTicketId = tickets.length + 1;
+    const now = new Date();
+    const formattedCreatedAt = now.toLocaleString();
 
     const ticketWithId = {
       ...ticketFields,
       id: newTicketId,
+      createdAt: formattedCreatedAt,
       status: 'OPEN',
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',

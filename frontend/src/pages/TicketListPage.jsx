@@ -225,6 +225,7 @@ function TicketListPage({ tickets, onViewDetails }) {
               <th>Category</th>
               <th>Priority</th>
               <th>Status</th>
+              <th>Created At</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -245,6 +246,7 @@ function TicketListPage({ tickets, onViewDetails }) {
                       {ticket.status}
                     </span>
                   </td>
+                  <td>{ticket.createdAt}</td>
                   <td>
                     <button
                       className="btn btn-sm btn-info"
@@ -257,7 +259,7 @@ function TicketListPage({ tickets, onViewDetails }) {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="7" className="text-center">
                   No tickets found.
                 </td>
               </tr>
