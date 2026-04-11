@@ -8,6 +8,7 @@ function TicketDetailsPage({
   onUpdateStatus,
   onAssignTechnician,
   onAddComment,
+  onAddAttachment,
 }) {
   if (!ticket) {
     return (
@@ -34,7 +35,7 @@ function TicketDetailsPage({
       </div>
 
       <CommentsSection ticket={ticket} onAddComment={onAddComment} />
-      <AttachmentUpload />
+      <AttachmentUpload ticket={ticket} onAddAttachment={onAddAttachment} />
       <StatusUpdate ticket={ticket} onUpdateStatus={onUpdateStatus} />
       <TechnicianAssign
         ticket={ticket}

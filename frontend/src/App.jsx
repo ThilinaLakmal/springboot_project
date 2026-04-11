@@ -25,6 +25,7 @@ function App() {
           message: 'Please check this issue soon.',
         },
       ],
+      attachments: ['wifi_issue_1.jpg', 'wifi_issue_2.jpg'],
     },
     {
       id: 2,
@@ -43,6 +44,7 @@ function App() {
           message: 'I am checking the projector now.',
         },
       ],
+      attachments: ['projector_photo.jpg'],
     },
   ]);
 
@@ -54,6 +56,7 @@ function App() {
       assignedTechnician: 'Not Assigned',
       resolutionNote: 'No resolution yet',
       comments: [],
+      attachments: [],
     };
 
     setTickets([...tickets, ticketWithId]);
@@ -126,6 +129,32 @@ function App() {
     setSelectedTicket(updatedSelectedTicket);
   };
 
+  const handleAddAttachment = (ticketId, fileName) => {
+    const updatedTickets = tickets.map((ticket) => {
+      if (ticket.id === ticketId) {
+        if (ticket.attachments.length >= 3) {
+          alert('Maximum 3 attachments allowed.');
+          return ticket;
+        }
+
+        return {
+          ...ticket,
+          attachments: [...ticket.attachments, fileName],
+        };
+      }
+
+      return ticket;
+    });
+
+    setTickets(updatedTickets);
+
+    const updatedSelectedTicket = updatedTickets.find(
+      (ticket) => ticket.id === ticketId
+    );
+
+    setSelectedTicket(updatedSelectedTicket);
+  };
+
   const handleViewDetails = (ticket) => {
     setSelectedTicket(ticket);
     setCurrentPage('details');
@@ -173,6 +202,7 @@ function App() {
           onUpdateStatus={handleUpdateStatus}
           onAssignTechnician={handleAssignTechnician}
           onAddComment={handleAddComment}
+          onAddAttachment={handleAddAttachment}
         />
       )}
     </div>
