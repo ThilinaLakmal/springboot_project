@@ -2,8 +2,9 @@ import { useState } from 'react';
 
 function CommentsSection({ ticket, onAddComment, onDeleteComment }) {
   const [commentText, setCommentText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (commentText.trim() === '') {
@@ -11,14 +12,27 @@ function CommentsSection({ ticket, onAddComment, onDeleteComment }) {
       return;
     }
 
-    onAddComment(ticket.id, commentText);
-    setCommentText('');
-    alert('Comment added successfully!');
+    try {
+      setSubmitting(true);
+      await onAddComment(ticket.id, commentText);
+      setCommentText('');
+      alert('Comment added successfully!');
+    } catch (error) {
+      console.error('Add comment error:', error);
+      alert('Failed to add comment.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDelete = (commentId) => {
-    onDeleteComment(ticket.id, commentId);
-    alert('Comment deleted successfully!');
+  const handleDelete = async (commentIndex) => {
+    try {
+      await onDeleteComment(ticket.id, commentIndex);
+      alert('Comment deleted successfully!');
+    } catch (error) {
+      console.error('Delete comment error:', error);
+      alert('Failed to delete comment.');
+    }
   };
 
   return (
@@ -36,30 +50,28 @@ function CommentsSection({ ticket, onAddComment, onDeleteComment }) {
           ></textarea>
         </div>
 
-        <button type="submit" className="btn btn-primary mb-3">
-          Add Comment
+        <button type="submit" className="btn btn-primary mb-3" disabled={submitting}>
+          {submitting ? 'Adding...' : 'Add Comment'}
         </button>
       </form>
 
       <ul className="list-group">
         {ticket.comments.length > 0 ? (
-          ticket.comments.map((comment) => (
+          ticket.comments.map((comment, index) => (
             <li
-              key={comment.id}
+              key={index}
               className="list-group-item d-flex justify-content-between align-items-center"
             >
               <div>
-                <strong>{comment.user}:</strong> {comment.message}
+                <strong>Comment {index + 1}:</strong> {comment}
               </div>
 
-              {comment.user === 'thilini' && (
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleDelete(comment.id)}
-                >
-                  Delete
-                </button>
-              )}
+              <button
+                className="btn btn-sm btn-danger"
+                onClick={() => handleDelete(index)}
+              >
+                Delete
+              </button>
             </li>
           ))
         ) : (

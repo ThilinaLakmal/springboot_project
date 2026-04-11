@@ -183,7 +183,9 @@ function TicketDetailsPage({
                 <p className="mb-2"><strong>Priority:</strong> {ticket.priority}</p>
                 <p className="mb-2"><strong>Status:</strong> {ticket.status}</p>
                 <p className="mb-2"><strong>Technician:</strong> {ticket.assignedTechnician}</p>
-                <p className="mb-0"><strong>Attachments:</strong> {ticket.attachments.length}</p>
+                <p className="mb-0">
+                  <strong>Attachments:</strong> {ticket.attachments?.length ?? 0}
+                </p>
               </div>
             </div>
 
@@ -205,7 +207,7 @@ function TicketDetailsPage({
           <div className="card shadow-sm border-0 text-center h-100">
             <div className="card-body">
               <h6 className="text-muted">Comments</h6>
-              <h3 className="text-primary mb-0">{ticket.comments.length}</h3>
+              <h3 className="text-primary mb-0">{ticket.comments?.length ?? 0}</h3>
             </div>
           </div>
         </div>
@@ -214,7 +216,7 @@ function TicketDetailsPage({
           <div className="card shadow-sm border-0 text-center h-100">
             <div className="card-body">
               <h6 className="text-muted">Attachments</h6>
-              <h3 className="text-success mb-0">{ticket.attachments.length}</h3>
+              <h3 className="text-success mb-0">{ticket.attachments?.length ?? 0}</h3>
             </div>
           </div>
         </div>
@@ -310,7 +312,8 @@ function TicketDetailsPage({
                       <strong>Category:</strong> {previewData.category || 'No category'}
                     </p>
                     <p className="mb-0">
-                      <strong>Description:</strong> {previewData.description || 'No description'}
+                      <strong>Description:</strong>{' '}
+                      {previewData.description || 'No description'}
                     </p>
                   </div>
                 </div>

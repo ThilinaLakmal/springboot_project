@@ -1,14 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function StatusUpdate({ ticket, onUpdateStatus }) {
   const [status, setStatus] = useState(ticket?.status || 'OPEN');
   const [resolutionNote, setResolutionNote] = useState(ticket?.resolutionNote || '');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    setStatus(ticket?.status || 'OPEN');
+    setResolutionNote(ticket?.resolutionNote || '');
+  }, [ticket]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    onUpdateStatus(ticket.id, status, resolutionNote);
-    alert('Ticket status updated successfully!');
+    try {
+      setSubmitting(true);
+      await onUpdateStatus(ticket.id, status, resolutionNote);
+      alert('Ticket status updated successfully!');
+    } catch (error) {
+      console.error('Update status error:', error);
+      alert('Failed to update status.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -41,8 +55,8 @@ function StatusUpdate({ ticket, onUpdateStatus }) {
           ></textarea>
         </div>
 
-        <button type="submit" className="btn btn-warning">
-          Update Status
+        <button type="submit" className="btn btn-warning" disabled={submitting}>
+          {submitting ? 'Updating...' : 'Update Status'}
         </button>
       </form>
     </div>

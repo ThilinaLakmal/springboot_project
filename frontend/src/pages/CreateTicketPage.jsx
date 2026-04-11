@@ -12,6 +12,7 @@ function CreateTicketPage({ onAddTicket }) {
 
   const [ticketData, setTicketData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -56,7 +57,7 @@ function CreateTicketPage({ onAddTicket }) {
     setErrors({});
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const isValid = validateForm();
@@ -66,9 +67,17 @@ function CreateTicketPage({ onAddTicket }) {
       return;
     }
 
-    onAddTicket(ticketData);
-    setTicketData(initialFormData);
-    setErrors({});
+    try {
+      setSubmitting(true);
+      await onAddTicket(ticketData);
+      setTicketData(initialFormData);
+      setErrors({});
+    } catch (error) {
+      console.error('Create ticket error:', error);
+      alert('Failed to create ticket. Please make sure backend is running.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -173,14 +182,15 @@ function CreateTicketPage({ onAddTicket }) {
           </div>
 
           <div className="d-flex gap-2">
-            <button type="submit" className="btn btn-success">
-              Submit Ticket
+            <button type="submit" className="btn btn-success" disabled={submitting}>
+              {submitting ? 'Submitting...' : 'Submit Ticket'}
             </button>
 
             <button
               type="button"
               className="btn btn-secondary"
               onClick={handleReset}
+              disabled={submitting}
             >
               Reset Form
             </button>

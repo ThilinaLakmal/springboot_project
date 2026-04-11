@@ -1,60 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CreateTicketPage from './pages/CreateTicketPage';
 import TicketListPage from './pages/TicketListPage';
 import TicketDetailsPage from './pages/TicketDetailsPage';
+
+const API_BASE_URL = 'http://localhost:8080/api/tickets';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('create');
   const [selectedTicket, setSelectedTicket] = useState(null);
   const [showNewTicketNotice, setShowNewTicketNotice] = useState(false);
+  const [tickets, setTickets] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const [tickets, setTickets] = useState([
-    {
-      id: 1,
-      title: 'WiFi not working',
-      category: 'Network',
-      description: 'The WiFi connection in Lab 2 is not working properly.',
-      priority: 'High',
-      contactDetails: 'thilini@example.com',
-      createdAt: '2026-04-11 09:15 AM',
-      status: 'OPEN',
-      assignedTechnician: 'Not Assigned',
-      resolutionNote: 'No resolution yet',
-      comments: [
-        {
-          id: 1,
-          user: 'thilini',
-          message: 'Please check this issue soon.',
-        },
-        {
-          id: 2,
-          user: 'Technician',
-          message: 'I am reviewing the issue now.',
-        },
-      ],
-      attachments: ['wifi_issue_1.jpg', 'wifi_issue_2.jpg'],
-    },
-    {
-      id: 2,
-      title: 'Projector issue',
-      category: 'Hardware',
-      description: 'The classroom projector is not turning on.',
-      priority: 'Medium',
-      contactDetails: 'thilini@example.com',
-      createdAt: '2026-04-11 10:30 AM',
-      status: 'IN_PROGRESS',
-      assignedTechnician: 'Thilin Abeykoon',
-      resolutionNote: 'Checking power cable',
-      comments: [
-        {
-          id: 1,
-          user: 'Technician',
-          message: 'I am checking the projector now.',
-        },
-      ],
-      attachments: ['projector_photo.jpg'],
-    },
-  ]);
+  const normalizeTicket = (ticket) => ({
+    ...ticket,
+    comments: Array.isArray(ticket.comments) ? ticket.comments : [],
+    attachments: Array.isArray(ticket.attachments) ? ticket.attachments : [],
+  });
+
+  const fetchAllTickets = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(API_BASE_URL);
+
+      if (!response.ok) {
+        throw new Error('Failed to load tickets');
+      }
+
+      const data = await response.json();
+      const normalizedTickets = data.map(normalizeTicket);
+      setTickets(normalizedTickets);
+    } catch (error) {
+      console.error('Error loading tickets:', error);
+      alert('Failed to load tickets from backend.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTicketById = async (ticketId) => {
+    const response = await fetch(`${API_BASE_URL}/${ticketId}`);
+
+    if (!response.ok) {
+      throw new Error('Failed to load ticket details');
+    }
+
+    const data = await response.json();
+    return normalizeTicket(data);
+  };
+
+  useEffect(() => {
+    fetchAllTickets();
+  }, []);
 
   const getNavButtonClass = (pageName, defaultClass) => {
     return currentPage === pageName
@@ -71,171 +69,178 @@ function App() {
     (ticket) => ticket.status === 'RESOLVED'
   ).length;
 
-  const addNewTicket = (newTicket) => {
+  const addNewTicket = async (newTicket) => {
     const { attachmentFileName, ...ticketFields } = newTicket;
-    const newTicketId = tickets.length + 1;
-    const now = new Date();
-    const formattedCreatedAt = now.toLocaleString();
 
-    const ticketWithId = {
+    const requestBody = {
       ...ticketFields,
-      id: newTicketId,
-      createdAt: formattedCreatedAt,
-      status: 'OPEN',
-      assignedTechnician: 'Not Assigned',
-      resolutionNote: 'No resolution yet',
-      comments: [],
-      attachments: attachmentFileName.trim() !== '' ? [attachmentFileName] : [],
+      attachments:
+        attachmentFileName.trim() !== '' ? [attachmentFileName.trim()] : [],
     };
 
-    const updatedTickets = [...tickets, ticketWithId];
+    const response = await fetch(API_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
 
-    setTickets(updatedTickets);
-    setSelectedTicket(ticketWithId);
+    if (!response.ok) {
+      throw new Error('Failed to create ticket');
+    }
+
+    const savedTicket = normalizeTicket(await response.json());
+
+    setSelectedTicket(savedTicket);
     setShowNewTicketNotice(true);
     setCurrentPage('details');
 
-    return newTicketId;
+    await fetchAllTickets();
+
+    return savedTicket.id;
   };
 
-  const handleUpdateStatus = (ticketId, newStatus, newResolutionNote) => {
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === ticketId
-        ? {
-            ...ticket,
-            status: newStatus,
-            resolutionNote: newResolutionNote,
-          }
-        : ticket
-    );
-
-    setTickets(updatedTickets);
-
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
-  };
-
-  const handleAssignTechnician = (ticketId, technicianName) => {
-    const updatedTickets = tickets.map((ticket) =>
-      ticket.id === ticketId
-        ? {
-            ...ticket,
-            assignedTechnician: technicianName,
-          }
-        : ticket
-    );
-
-    setTickets(updatedTickets);
-
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
-  };
-
-  const handleAddComment = (ticketId, commentText) => {
-    const updatedTickets = tickets.map((ticket) => {
-      if (ticket.id === ticketId) {
-        const newComment = {
-          id: ticket.comments.length + 1,
-          user: 'thilini',
-          message: commentText,
-        };
-
-        return {
-          ...ticket,
-          comments: [...ticket.comments, newComment],
-        };
-      }
-
-      return ticket;
+  const handleUpdateStatus = async (ticketId, newStatus, newResolutionNote) => {
+    const response = await fetch(`${API_BASE_URL}/${ticketId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        status: newStatus,
+        resolutionNote: newResolutionNote,
+      }),
     });
 
-    setTickets(updatedTickets);
+    if (!response.ok) {
+      throw new Error('Failed to update status');
+    }
 
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
   };
 
-  const handleDeleteComment = (ticketId, commentId) => {
-    const updatedTickets = tickets.map((ticket) => {
-      if (ticket.id === ticketId) {
-        return {
-          ...ticket,
-          comments: ticket.comments.filter((comment) => comment.id !== commentId),
-        };
-      }
-
-      return ticket;
+  const handleAssignTechnician = async (ticketId, technicianName) => {
+    const response = await fetch(`${API_BASE_URL}/${ticketId}/assign-technician`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        assignedTechnician: technicianName,
+      }),
     });
 
-    setTickets(updatedTickets);
+    if (!response.ok) {
+      throw new Error('Failed to assign technician');
+    }
 
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
   };
 
-  const handleAddAttachment = (ticketId, fileName) => {
-    const updatedTickets = tickets.map((ticket) => {
-      if (ticket.id === ticketId) {
-        if (ticket.attachments.length >= 3) {
-          alert('Maximum 3 attachments allowed.');
-          return ticket;
-        }
-
-        return {
-          ...ticket,
-          attachments: [...ticket.attachments, fileName],
-        };
-      }
-
-      return ticket;
+  const handleAddComment = async (ticketId, commentText) => {
+    const response = await fetch(`${API_BASE_URL}/${ticketId}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        comment: commentText,
+      }),
     });
 
-    setTickets(updatedTickets);
+    if (!response.ok) {
+      throw new Error('Failed to add comment');
+    }
 
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
   };
 
-  const handleDeleteAttachment = (ticketId, fileName) => {
-    const updatedTickets = tickets.map((ticket) => {
-      if (ticket.id === ticketId) {
-        return {
-          ...ticket,
-          attachments: ticket.attachments.filter((file) => file !== fileName),
-        };
+  const handleDeleteComment = async (ticketId, commentIndex) => {
+    const response = await fetch(
+      `${API_BASE_URL}/${ticketId}/comments/${commentIndex}`,
+      {
+        method: 'DELETE',
       }
+    );
 
-      return ticket;
+    if (!response.ok) {
+      throw new Error('Failed to delete comment');
+    }
+
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
+  };
+
+  const handleAddAttachment = async (ticketId, fileName) => {
+    const response = await fetch(`${API_BASE_URL}/${ticketId}/attachments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        attachmentFileName: fileName,
+      }),
     });
 
-    setTickets(updatedTickets);
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || 'Failed to add attachment');
+    }
 
-    const updatedSelectedTicket = updatedTickets.find(
-      (ticket) => ticket.id === ticketId
-    );
-
-    setSelectedTicket(updatedSelectedTicket);
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
   };
 
-  const handleViewDetails = (ticket) => {
-    setSelectedTicket(ticket);
-    setShowNewTicketNotice(false);
-    setCurrentPage('details');
+  const handleDeleteAttachment = async (ticketId, fileName) => {
+    const ticket = tickets.find((item) => item.id === ticketId);
+
+    if (!ticket) {
+      throw new Error('Ticket not found');
+    }
+
+    const attachmentIndex = ticket.attachments.findIndex(
+      (attachment) => attachment === fileName
+    );
+
+    if (attachmentIndex === -1) {
+      throw new Error('Attachment not found');
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/${ticketId}/attachments/${attachmentIndex}`,
+      {
+        method: 'DELETE',
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to delete attachment');
+    }
+
+    const updatedTicket = normalizeTicket(await response.json());
+    setSelectedTicket(updatedTicket);
+    await fetchAllTickets();
+  };
+
+  const handleViewDetails = async (ticket) => {
+    try {
+      const freshTicket = await fetchTicketById(ticket.id);
+      setSelectedTicket(freshTicket);
+      setShowNewTicketNotice(false);
+      setCurrentPage('details');
+    } catch (error) {
+      console.error('Error loading ticket details:', error);
+      alert('Failed to load ticket details.');
+    }
   };
 
   const handleBackToList = () => {
@@ -323,15 +328,21 @@ function App() {
         </div>
       </div>
 
-      {currentPage === 'create' && (
+      {loading && (
+        <div className="container mt-4">
+          <div className="alert alert-info">Loading tickets from backend...</div>
+        </div>
+      )}
+
+      {!loading && currentPage === 'create' && (
         <CreateTicketPage onAddTicket={addNewTicket} />
       )}
 
-      {currentPage === 'list' && (
+      {!loading && currentPage === 'list' && (
         <TicketListPage tickets={tickets} onViewDetails={handleViewDetails} />
       )}
 
-      {currentPage === 'details' && (
+      {!loading && currentPage === 'details' && (
         <TicketDetailsPage
           ticket={selectedTicket}
           showNewTicketNotice={showNewTicketNotice}

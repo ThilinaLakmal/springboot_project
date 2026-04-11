@@ -1,12 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function TechnicianAssign({ ticket, onAssignTechnician }) {
-  const [technician, setTechnician] = useState(ticket?.assignedTechnician || 'Not Assigned');
+  const [technician, setTechnician] = useState(
+    ticket?.assignedTechnician || 'Not Assigned'
+  );
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    setTechnician(ticket?.assignedTechnician || 'Not Assigned');
+  }, [ticket]);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onAssignTechnician(ticket.id, technician);
-    alert('Technician assigned successfully!');
+
+    try {
+      setSubmitting(true);
+      await onAssignTechnician(ticket.id, technician);
+      alert('Technician assigned successfully!');
+    } catch (error) {
+      console.error('Assign technician error:', error);
+      alert('Failed to assign technician.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -28,8 +44,8 @@ function TechnicianAssign({ ticket, onAssignTechnician }) {
           </select>
         </div>
 
-        <button type="submit" className="btn btn-dark">
-          Assign Technician
+        <button type="submit" className="btn btn-dark" disabled={submitting}>
+          {submitting ? 'Assigning...' : 'Assign Technician'}
         </button>
       </form>
     </div>
