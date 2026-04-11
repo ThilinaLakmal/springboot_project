@@ -1,0 +1,30 @@
+Member 3 - Incident Management Module
+
+1. Create Ticket
+2. View All Tickets
+3. View Single Ticket
+4. Update Ticket Status
+5. Assign Technician
+6. Upload Attachments (max 3 images)
+7. Add Comments
+8. Delete Own Comment
+9. Add Resolution Note
+
+Backend Work
+- Ticket model/entity
+- Comment model/entity
+- Attachment model/entity
+- Ticket APIs
+- Comment APIs
+- Attachment upload API
+- Technician assign API
+- Status update API
+
+Frontend Work
+- Create Ticket Page
+- Ticket List Page
+- Ticket Details Page
+- Status Update Section
+- Technician Assign Section
+- Attachment Upload Section
+- Comments Section
