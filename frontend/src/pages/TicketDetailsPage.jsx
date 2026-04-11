@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import CommentsSection from '../components/CommentsSection';
 import AttachmentUpload from '../components/AttachmentUpload';
 import StatusUpdate from '../components/StatusUpdate';
@@ -14,6 +15,22 @@ function TicketDetailsPage({
   onAddAttachment,
   onDeleteAttachment,
 }) {
+  const [previewData, setPreviewData] = useState({
+    title: '',
+    category: '',
+    description: '',
+  });
+
+  useEffect(() => {
+    if (ticket) {
+      setPreviewData({
+        title: ticket.title || '',
+        category: ticket.category || '',
+        description: ticket.description || '',
+      });
+    }
+  }, [ticket]);
+
   if (!ticket) {
     return (
       <div className="container mt-5">
@@ -52,6 +69,23 @@ function TicketDetailsPage({
     }
 
     return 'bg-dark';
+  };
+
+  const handlePreviewChange = (event) => {
+    const { name, value } = event.target;
+
+    setPreviewData({
+      ...previewData,
+      [name]: value,
+    });
+  };
+
+  const handlePreviewReset = () => {
+    setPreviewData({
+      title: ticket.title || '',
+      category: ticket.category || '',
+      description: ticket.description || '',
+    });
   };
 
   return (
@@ -203,6 +237,90 @@ function TicketDetailsPage({
             <div className="card-body">
               <h6 className="text-muted">Technician</h6>
               <h6 className="text-dark mb-0 mt-2">{ticket.assignedTechnician}</h6>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="card shadow-sm border mb-4">
+        <div className="card-body p-4">
+          <h4 className="text-dark mb-3">Editable Preview Card</h4>
+
+          <div className="row g-4">
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100">
+                <h5 className="text-secondary mb-3">Edit Preview Fields</h5>
+
+                <div className="mb-3">
+                  <label className="form-label">Preview Title</label>
+                  <input
+                    type="text"
+                    name="title"
+                    className="form-control"
+                    value={previewData.title}
+                    onChange={handlePreviewChange}
+                  />
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Preview Category</label>
+                  <select
+                    name="category"
+                    className="form-select"
+                    value={previewData.category}
+                    onChange={handlePreviewChange}
+                  >
+                    <option value="Network">Network</option>
+                    <option value="Hardware">Hardware</option>
+                    <option value="Software">Software</option>
+                    <option value="Account">Account</option>
+                    <option value="Security">Security</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className="mb-3">
+                  <label className="form-label">Preview Description</label>
+                  <textarea
+                    name="description"
+                    className="form-control"
+                    rows="5"
+                    value={previewData.description}
+                    onChange={handlePreviewChange}
+                  ></textarea>
+                </div>
+
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={handlePreviewReset}
+                >
+                  Reset Preview
+                </button>
+              </div>
+            </div>
+
+            <div className="col-md-6">
+              <div className="border rounded p-3 h-100 bg-light">
+                <h5 className="text-secondary mb-3">Preview Output</h5>
+
+                <div className="card border-0 shadow-sm">
+                  <div className="card-body">
+                    <h5 className="text-primary">{previewData.title || 'No title'}</h5>
+                    <p className="mb-2">
+                      <strong>Category:</strong> {previewData.category || 'No category'}
+                    </p>
+                    <p className="mb-0">
+                      <strong>Description:</strong> {previewData.description || 'No description'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-3">
+                  <small className="text-muted">
+                    This preview is for UI demonstration only. It does not permanently update the ticket.
+                  </small>
+                </div>
+              </div>
             </div>
           </div>
         </div>
