@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CreateTicketPage from './pages/CreateTicketPage';
 import TicketListPage from './pages/TicketListPage';
+import TicketDetailsPage from './pages/TicketDetailsPage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('create');
@@ -18,16 +19,24 @@ function App() {
           </button>
 
           <button
-            className="btn btn-warning"
+            className="btn btn-warning me-2"
             onClick={() => setCurrentPage('list')}
           >
             View Tickets
+          </button>
+
+          <button
+            className="btn btn-info"
+            onClick={() => setCurrentPage('details')}
+          >
+            Ticket Details
           </button>
         </div>
       </nav>
 
       {currentPage === 'create' && <CreateTicketPage />}
       {currentPage === 'list' && <TicketListPage />}
+      {currentPage === 'details' && <TicketDetailsPage />}
     </div>
   );
 }
