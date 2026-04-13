@@ -1,54 +1,67 @@
 package com.smartcampus.config;
 
+import com.smartcampus.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(cors -> cors.configurationSource(request -> {
                 CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175"));
+                config.setAllowedOrigins(List.of(
+                        "http://localhost:5173",
+                        "http://localhost:5174",
+                        "http://localhost:5175"
+                ));
                 config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 config.setAllowedHeaders(List.of("*"));
+                config.setAllowCredentials(true);
                 return config;
             }))
-            .csrf(csrf -> csrf.disable()) // Disabled for local development
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/resources/**", "/api/v1/resource-types/**", "/api/v1/bookings/**", "/api/v1/users/**", "/uploads/**").permitAll()
-                .anyRequest().authenticated()
+                // Public endpoints — no JWT required
+                .requestMatchers(HttpMethod.POST, "/api/v1/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/resources/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/resource-types/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+
+                // Admin-only endpoints
+                .requestMatchers(HttpMethod.PUT, "/api/v1/bookings/*/approve").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/bookings/*/reject").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/bookings/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/resources/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/resources/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/resources/**").hasRole("ADMIN")
+
+                // All other API endpoints require authentication
+                .requestMatchers("/api/v1/**").authenticated()
+
+                // Everything else is permitted (e.g. actuator, error pages)
+                .anyRequest().permitAll()
             )
-            .httpBasic(basic -> {}); // Standard Basic Auth for simplicity
+            // Add JWT filter before Spring Security's default auth filter
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
-        UserDetails admin = User.withDefaultPasswordEncoder()
-                .username("admin")
-                .password("admin")
-                .roles("ADMIN", "USER")
-                .build();
-        return new InMemoryUserDetailsManager(user, admin);
     }
 }

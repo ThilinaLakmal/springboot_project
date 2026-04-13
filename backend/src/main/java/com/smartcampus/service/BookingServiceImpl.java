@@ -5,6 +5,7 @@ import com.smartcampus.model.entity.Booking;
 import com.smartcampus.model.entity.Resource;
 import com.smartcampus.model.entity.User;
 import com.smartcampus.model.enums.BookingStatus;
+import com.smartcampus.model.enums.NotificationType;
 import com.smartcampus.repository.BookingRepository;
 import com.smartcampus.repository.ResourceRepository;
 import com.smartcampus.repository.UserRepository;
@@ -28,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Override
     public List<BookingDto> getAllBookings() {
@@ -115,6 +117,19 @@ public class BookingServiceImpl implements BookingService {
 
         booking = bookingRepository.save(booking);
         log.info("Booking created successfully with ID: {}", booking.getId());
+
+        // Send notification to the user that their booking is pending
+        try {
+            notificationService.createNotification(
+                    user.getId(),
+                    "Your booking for '" + resource.getName() + "' on " + dto.getBookingDate()
+                            + " (" + dto.getStartTime() + " - " + dto.getEndTime() + ") has been submitted and is PENDING approval.",
+                    NotificationType.BOOKING
+            );
+        } catch (Exception e) {
+            log.warn("Failed to send booking creation notification: {}", e.getMessage());
+        }
+
         return mapToDto(booking);
     }
 
@@ -133,6 +148,20 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdminReason(reason);
         booking = bookingRepository.save(booking);
         log.info("Booking ID: {} approved successfully", id);
+
+        // Notify the user that their booking was approved
+        try {
+            String message = "Your booking for '" + booking.getResource().getName() + "' on "
+                    + booking.getBookingDate() + " (" + booking.getStartTime() + " - " + booking.getEndTime()
+                    + ") has been APPROVED.";
+            if (reason != null && !reason.isBlank()) {
+                message += " Admin note: " + reason;
+            }
+            notificationService.createNotification(booking.getUser().getId(), message, NotificationType.BOOKING);
+        } catch (Exception e) {
+            log.warn("Failed to send booking approval notification: {}", e.getMessage());
+        }
+
         return mapToDto(booking);
     }
 
@@ -151,6 +180,20 @@ public class BookingServiceImpl implements BookingService {
         booking.setAdminReason(reason);
         booking = bookingRepository.save(booking);
         log.info("Booking ID: {} rejected successfully", id);
+
+        // Notify the user that their booking was rejected
+        try {
+            String message = "Your booking for '" + booking.getResource().getName() + "' on "
+                    + booking.getBookingDate() + " (" + booking.getStartTime() + " - " + booking.getEndTime()
+                    + ") has been REJECTED.";
+            if (reason != null && !reason.isBlank()) {
+                message += " Reason: " + reason;
+            }
+            notificationService.createNotification(booking.getUser().getId(), message, NotificationType.BOOKING);
+        } catch (Exception e) {
+            log.warn("Failed to send booking rejection notification: {}", e.getMessage());
+        }
+
         return mapToDto(booking);
     }
 

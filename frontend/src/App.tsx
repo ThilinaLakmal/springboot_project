@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -20,57 +21,60 @@ import { ResourceDetails } from './pages/facilities/ResourceDetails';
 import { QRCodeGenerator } from './pages/facilities/QRCodeGenerator';
 import { QRScanner } from './pages/facilities/QRScanner';
 
+const GOOGLE_CLIENT_ID = '502517710174-srgf7jfmv11mp2n4il147dkgpdqd015u.apps.googleusercontent.com';
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      {/* AuthProvider wraps everything to provide authentication context */}
-      <AuthProvider>
-        {/* Global Toasts Notifications */}
-        <Toaster position="top-right" toastOptions={{ className: 'text-sm font-medium', duration: 3000 }} />
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <BrowserRouter>
+        {/* AuthProvider wraps everything to provide authentication context */}
+        <AuthProvider>
+          {/* Global Toasts Notifications */}
+          <Toaster position="top-right" toastOptions={{ className: 'text-sm font-medium', duration: 3000 }} />
 
-        <Routes>
-          {/* Public Route */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/feed" element={<ResourceFeed />} />
+          <Routes>
+            {/* Public Route */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/feed" element={<ResourceFeed />} />
 
-          {/* Protected Application Routes */}
-          <Route element={<ProtectedRoute />}>
-            <Route path="/app" element={<MainLayout />}>
+            {/* Protected Application Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/app" element={<MainLayout />}>
 
-              {/* Redirect /app to dashboard */}
-              <Route index element={<Navigate to="/app/facilities/dashboard" replace />} />
+                {/* Redirect /app to dashboard */}
+                <Route index element={<Navigate to="/app/facilities/dashboard" replace />} />
 
-              {/* Facilities & Assets Module Routes */}
-              <Route path="facilities/dashboard" element={<Dashboard />} />
-              <Route path="facilities/feed" element={<Navigate to="/feed" replace />} />
-              <Route path="facilities/resources" element={<ResourceList />} />
-              <Route path="facilities/resources/add" element={<AddResource />} />
-              <Route path="facilities/resources/manage" element={<ProtectedRoute requiredRole="ADMIN" />} >
-                <Route index element={<ManageResources />} />
+                {/* Facilities & Assets Module Routes */}
+                <Route path="facilities/dashboard" element={<Dashboard />} />
+                <Route path="facilities/feed" element={<Navigate to="/feed" replace />} />
+                <Route path="facilities/resources" element={<ResourceList />} />
+                <Route path="facilities/resources/add" element={<AddResource />} />
+                <Route path="facilities/resources/manage" element={<ProtectedRoute requiredRole="ADMIN" />} >
+                  <Route index element={<ManageResources />} />
+                </Route>
+                <Route path="facilities/resources/edit/:id" element={<EditResource />} />
+                <Route path="facilities/resources/:id" element={<ResourceDetails />} />
+                <Route path="facilities/bookings/my" element={<MyBookings />} />
+                <Route path="facilities/bookings/manage" element={<ProtectedRoute requiredRole="ADMIN" />}>
+                  <Route index element={<ManageBookings />} />
+                </Route>
+
+                {/* QR Check-In Routes */}
+                <Route path="facilities/scan" element={<QRScanner />} />
+                <Route path="facilities/qr-codes" element={<ProtectedRoute requiredRole="ADMIN" />}>
+                  <Route index element={<QRCodeGenerator />} />
+                </Route>
+
+                {/* Other modules placeholders */}
               </Route>
-              <Route path="facilities/resources/edit/:id" element={<EditResource />} />
-              <Route path="facilities/resources/:id" element={<ResourceDetails />} />
-              <Route path="facilities/bookings/my" element={<MyBookings />} />
-              <Route path="facilities/bookings/manage" element={<ProtectedRoute requiredRole="ADMIN" />}>
-                <Route index element={<ManageBookings />} />
-              </Route>
-
-              {/* QR Check-In Routes */}
-              <Route path="facilities/scan" element={<QRScanner />} />
-              <Route path="facilities/qr-codes" element={<ProtectedRoute requiredRole="ADMIN" />}>
-                <Route index element={<QRCodeGenerator />} />
-              </Route>
-
-              {/* Other modules placeholders */}
             </Route>
-          </Route>
 
-          {/* Fallback 404 Route */}
-          <Route path="*" element={<Navigate to="/app/facilities/dashboard" replace />} />
-        </Routes>
-      </AuthProvider>
-    </BrowserRouter>
+            {/* Fallback 404 Route */}
+            <Route path="*" element={<Navigate to="/app/facilities/dashboard" replace />} />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 };
 

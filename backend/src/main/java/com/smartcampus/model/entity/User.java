@@ -31,6 +31,12 @@ public class User {
     @Column(nullable = false, length = 20)
     private String role;
 
+    @Column(unique = true)
+    private String googleId;
+
+    @Column(length = 500)
+    private String profilePicture;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
