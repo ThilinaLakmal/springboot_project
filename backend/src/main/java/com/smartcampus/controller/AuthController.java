@@ -103,6 +103,13 @@ public class AuthController {
                 log.info("Existing user logged in with ID: {} and role: {}", user.getId(), user.getRole());
             }
 
+            // Block login for deactivated users
+            if (Boolean.FALSE.equals(user.getIsActive())) {
+                log.warn("Blocked user attempted login: ID={}, email={}", user.getId(), user.getEmail());
+                return ResponseEntity.status(403)
+                        .body(AuthResponse.builder().token(null).build());
+            }
+
             // Generate JWT
             String jwt = jwtService.generateToken(user);
 

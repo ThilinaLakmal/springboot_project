@@ -7,6 +7,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 import { Login } from './pages/Login';
+import { Profile } from './pages/Profile';
+import { UserManagement } from './pages/UserManagement';
 
 // Actual facilities pages imports
 import { Dashboard } from './pages/facilities/Dashboard';
@@ -63,6 +65,15 @@ const App: React.FC = () => {
                 <Route path="facilities/scan" element={<QRScanner />} />
                 <Route path="facilities/qr-codes" element={<ProtectedRoute requiredRole="ADMIN" />}>
                   <Route index element={<QRCodeGenerator />} />
+                </Route>
+
+                {/* Profile Pages */}
+                <Route path="profile" element={<Profile />} />
+                <Route path="profile/:id" element={<Profile />} />
+
+                {/* User Management (Admin only) */}
+                <Route path="users" element={<ProtectedRoute requiredRole="ADMIN" />}>
+                  <Route index element={<UserManagement />} />
                 </Route>
 
                 {/* Other modules placeholders */}

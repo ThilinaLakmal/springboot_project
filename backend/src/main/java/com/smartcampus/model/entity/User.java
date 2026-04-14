@@ -37,6 +37,10 @@ public class User {
     @Column(length = 500)
     private String profilePicture;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isActive = true;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;

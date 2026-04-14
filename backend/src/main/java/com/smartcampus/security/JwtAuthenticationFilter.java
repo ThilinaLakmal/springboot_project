@@ -1,5 +1,7 @@
 package com.smartcampus.security;
 
+import com.smartcampus.model.entity.User;
+import com.smartcampus.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -23,6 +26,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -35,6 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             Long userId = jwtService.extractUserId(token);
             String role = jwtService.extractRole(token);
             String email = jwtService.extractEmail(token);
+
+            // Check if user is still active in the database
+            Optional<User> userOpt = userRepository.findById(userId);
+            if (userOpt.isPresent() && Boolean.FALSE.equals(userOpt.get().getIsActive())) {
+                log.warn("Blocked user attempted API access: ID={}, email={}", userId, email);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"Your account has been blocked. Contact an administrator.\"}");
+                return; // Do not continue filter chain
+            }
 
             // Create authority with ROLE_ prefix for Spring Security
             List<SimpleGrantedAuthority> authorities = List.of(
@@ -63,3 +77,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 }
+

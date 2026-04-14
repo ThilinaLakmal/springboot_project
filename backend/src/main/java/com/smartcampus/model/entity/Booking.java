@@ -25,11 +25,11 @@ public class Booking {
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "resource_id", nullable = false)
+    @JoinColumn(name = "resource_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booking_resource_new"))
     private Resource resource;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_booking_user_new"))
     private User user;
 
     @Column(nullable = false)

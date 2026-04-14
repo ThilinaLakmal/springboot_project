@@ -1,7 +1,7 @@
 import React from 'react';
 import { LogOut, User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { NotificationPanel } from './NotificationPanel';
 import toast from 'react-hot-toast';
 
@@ -22,24 +22,27 @@ export const Header: React.FC = () => {
         <NotificationPanel />
 
         <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-slate-800">{user?.name || 'Guest'}</p>
-            <p className="text-xs text-slate-500 capitalize">{user?.role?.toLowerCase() || 'User'}</p>
-          </div>
-
-          {/* Profile Picture or Default Icon */}
-          {user?.profilePicture ? (
-            <img
-              src={user.profilePicture}
-              alt={user.name}
-              className="w-9 h-9 rounded-full border-2 border-slate-200 object-cover"
-              referrerPolicy="no-referrer"
-            />
-          ) : (
-            <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 border border-slate-200">
-              <UserIcon size={18} />
+          {/* Clickable profile link — navigates to /app/profile */}
+          <Link to="/app/profile" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-semibold text-slate-800">{user?.name || 'Guest'}</p>
+              <p className="text-xs text-slate-500 capitalize">{user?.role?.toLowerCase() || 'User'}</p>
             </div>
-          )}
+
+            {/* Profile Picture or Default Icon */}
+            {user?.profilePicture ? (
+              <img
+                src={user.profilePicture}
+                alt={user.name}
+                className="w-9 h-9 rounded-full border-2 border-slate-200 object-cover"
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 border border-slate-200">
+                <UserIcon size={18} />
+              </div>
+            )}
+          </Link>
 
           <button 
             onClick={handleLogout}
@@ -53,3 +56,4 @@ export const Header: React.FC = () => {
     </header>
   );
 };
+

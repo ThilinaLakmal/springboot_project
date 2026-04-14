@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown, LayoutList, QrCode, Camera } from 'lucide-react';
+import { LayoutDashboard, Building2, PlusCircle, Settings, Box, ChevronDown, LayoutList, QrCode, Camera, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const Sidebar: React.FC = () => {
@@ -84,6 +84,30 @@ export const Sidebar: React.FC = () => {
             </nav>
           </div>
         </div>
+
+        {/* Administration section — Admin only */}
+        {isAdmin && (
+          <>
+            <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-8 mb-4 px-2">
+              Administration
+            </div>
+            <nav className="space-y-1">
+              <NavLink
+                to="/app/users"
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'bg-indigo-600/15 text-indigo-400'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`
+                }
+              >
+                <Users size={18} />
+                User Management
+              </NavLink>
+            </nav>
+          </>
+        )}
       </div>
       
       {/* Bottom Info */}
