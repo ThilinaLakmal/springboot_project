@@ -28,29 +28,39 @@ public class AuthService {
     private final NotificationService notificationService;
 
     public void registerUser(RegisterRequest request) {
-        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
-        if (existingUser.isPresent()) {
-            throw new RuntimeException("Email already in use.");
-        }
+        Optional<User> existingUserOpt = userRepository.findByEmail(request.getEmail());
+        User user;
 
         String otp = generateOtp();
 
-        User user = User.builder()
-                .username(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role("STUDENT")
-                .isEmailVerified(false)
-                .otpCode(otp)
-                .otpExpiryTime(LocalDateTime.now().plusMinutes(5))
-                .build();
+        if (existingUserOpt.isPresent()) {
+            user = existingUserOpt.get();
+            if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+                throw new RuntimeException("Email already in use.");
+            }
+            // User exists but isn't verified. Update their password and send a new OTP.
+            user.setUsername(request.getName());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setOtpCode(otp);
+            user.setOtpExpiryTime(LocalDateTime.now().plusMinutes(5));
+        } else {
+            user = User.builder()
+                    .username(request.getName())
+                    .email(request.getEmail())
+                    .password(passwordEncoder.encode(request.getPassword()))
+                    .role("STUDENT")
+                    .isEmailVerified(false)
+                    .otpCode(otp)
+                    .otpExpiryTime(LocalDateTime.now().plusMinutes(5))
+                    .build();
+        }
 
         userRepository.save(user);
-        
+
         emailService.sendOtpEmail(user.getEmail(), otp);
-        
-        log.info("New user registered manually, OTP sent: {}", user.getEmail());
-        
+
+        log.info("New/Unverified user registered manually, OTP sent: {}", user.getEmail());
+
         try {
             notificationService.notifyAllAdmins(
                     "New user registered manually: " + user.getUsername() + " (" + user.getEmail() + ")",
