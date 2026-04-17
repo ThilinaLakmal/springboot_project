@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
 import { Login } from './pages/Login';
+import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { UserManagement } from './pages/UserManagement';
 
@@ -37,6 +38,7 @@ const App: React.FC = () => {
           <Routes>
             {/* Public Route */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route path="/feed" element={<ResourceFeed />} />
 
             {/* Protected Application Routes */}

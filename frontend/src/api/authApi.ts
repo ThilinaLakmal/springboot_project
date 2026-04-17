@@ -16,6 +16,18 @@ export const googleLogin = (credential: string) => {
   return api.post<AuthResponseData>('/auth/google', { credential });
 };
 
+export const register = (data: any) => {
+  return api.post<{message: string}>('/auth/register', data);
+};
+
+export const verifyOtp = (email: string, otp: string) => {
+  return api.post<{message: string}>('/auth/verify-otp', { email, otp });
+};
+
+export const login = (data: any) => {
+  return api.post<AuthResponseData>('/auth/login', data);
+};
+
 /**
  * Fetch the current authenticated user's info.
  */

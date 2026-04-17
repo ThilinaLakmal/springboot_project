@@ -6,10 +6,14 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.smartcampus.dto.AuthResponse;
 import com.smartcampus.dto.GoogleLoginRequest;
+import com.smartcampus.dto.LoginRequest;
+import com.smartcampus.dto.RegisterRequest;
+import com.smartcampus.dto.VerifyOtpRequest;
 import com.smartcampus.model.entity.User;
 import com.smartcampus.model.enums.NotificationType;
 import com.smartcampus.repository.UserRepository;
 import com.smartcampus.security.JwtService;
+import com.smartcampus.service.AuthService;
 import com.smartcampus.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -29,16 +33,19 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final NotificationService notificationService;
+    private final AuthService authService;
     private final GoogleIdTokenVerifier verifier;
 
     public AuthController(
             UserRepository userRepository,
             JwtService jwtService,
             NotificationService notificationService,
+            AuthService authService,
             @Value("${app.google.client-id}") String googleClientId) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.notificationService = notificationService;
+        this.authService = authService;
         this.verifier = new GoogleIdTokenVerifier.Builder(
                 new NetHttpTransport(), GsonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(googleClientId))
@@ -84,6 +91,7 @@ public class AuthController {
                         .role("STUDENT")
                         .googleId(googleId)
                         .profilePicture(picture)
+                        .isEmailVerified(true)
                         .build();
                 user = userRepository.save(user);
                 log.info("New user auto-registered with ID: {} and role: STUDENT", user.getId());
@@ -173,5 +181,35 @@ public class AuthController {
                 .build();
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        try {
+            authService.registerUser(request);
+            return ResponseEntity.ok(Map.of("message", "Registration successful. Please verify your email."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpRequest request) {
+        try {
+            authService.verifyOtp(request.getEmail(), request.getOtp());
+            return ResponseEntity.ok(Map.of("message", "Email verified successfully. You can now login."));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        try {
+            AuthResponse response = authService.login(request);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));
+        }
     }
 }

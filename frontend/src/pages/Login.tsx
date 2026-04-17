@@ -1,15 +1,44 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, User } from '../contexts/AuthContext';
-import { Building2, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Building2, ArrowRight, ShieldCheck, Sparkles, Mail, Lock } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import { googleLogin } from '../api/authApi';
+import { googleLogin, login as manualLogin } from '../api/authApi';
 import toast from 'react-hot-toast';
 
 export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleManualLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await manualLogin({ email, password });
+      const data = response.data;
+      
+      const userData: User = {
+        id: data.userId.toString(),
+        name: data.name,
+        email: data.email,
+        role: data.role as 'ADMIN' | 'USER' | 'STUDENT',
+        profilePicture: data.profilePicture,
+      };
+
+      login(userData, data.token);
+      toast.success(`Welcome back, ${userData.name}!`);
+      navigate('/app/facilities/dashboard');
+    } catch (err: any) {
+      console.error('Manual login error:', err);
+      const message = err.response?.data?.error || 'Authentication failed. Please try again.';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) {
@@ -83,12 +112,75 @@ export const Login: React.FC = () => {
           <div className="mb-6 text-center">
             <h3 className="text-xl font-bold text-slate-800">Welcome to Smart Campus</h3>
             <p className="text-sm text-slate-500 mt-1">
-              Sign in with your university Google account to continue.
+              Sign in to your account to continue.
             </p>
           </div>
 
-          {/* Google Sign-In Section */}
           <div className="space-y-6">
+            {/* Manual Login Form */}
+            <form onSubmit={handleManualLogin} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Email Address</label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="john@example.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700">Password</label>
+                <div className="mt-1 relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-slate-400" />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none block w-full pl-10 px-3 py-2 border border-slate-300 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                >
+                  {loading ? 'Signing in...' : 'Sign In'}
+                </button>
+              </div>
+            </form>
+
+            <div className="mt-2 text-center text-sm">
+               <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+                  Don't have an account? Sign up here.
+               </Link>
+            </div>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-3 bg-white text-slate-400 font-medium uppercase tracking-wider">
+                  Or continue with
+                </span>
+              </div>
+            </div>
             {/* Google Sign-In Button */}
             <div className="flex justify-center">
               {loading ? (
@@ -126,18 +218,6 @@ export const Login: React.FC = () => {
                   logo_alignment="left"
                 />
               )}
-            </div>
-
-            {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200"></div>
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-3 bg-white text-slate-400 font-medium uppercase tracking-wider">
-                  Secure OAuth 2.0
-                </span>
-              </div>
             </div>
 
             {/* Feature Cards */}

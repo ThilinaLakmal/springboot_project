@@ -41,6 +41,15 @@ public class User {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isEmailVerified = false;
+
+    @Column(length = 6)
+    private String otpCode;
+
+    private LocalDateTime otpExpiryTime;
+
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
