@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, X } from 'lucide-react';
-import { getNotifications, getUnreadCount, markAsRead, markAllAsRead, NotificationData } from '../../api/notificationApi';
+import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, X, Trash2 } from 'lucide-react';
+import { getNotifications, getUnreadCount, markAsRead, markAllAsRead, deleteNotification, clearAllNotifications, NotificationData } from '../../api/notificationApi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const NotificationPanel: React.FC = () => {
@@ -83,6 +83,30 @@ export const NotificationPanel: React.FC = () => {
     }
   };
 
+  const handleDeleteNotification = async (id: number, isRead: boolean) => {
+    try {
+      await deleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      if (!isRead) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
+      }
+    } catch (err) {
+      console.error('Failed to delete notification', err);
+    }
+  };
+
+  const handleClearAll = async () => {
+    if (!window.confirm("Are you sure you want to delete all notifications?")) return;
+    
+    try {
+      await clearAllNotifications();
+      setNotifications([]);
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Failed to clear notifications', err);
+    }
+  };
+
   const getTypeIcon = (type: string) => {
     switch (type) {
       case 'BOOKING':
@@ -141,115 +165,143 @@ export const NotificationPanel: React.FC = () => {
       </button>
 
       {/* Dropdown Panel */}
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-          {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50 border-b border-slate-200 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bell size={16} className="text-blue-600" />
-              <h3 className="text-sm font-bold text-slate-800">Notifications</h3>
-              {unreadCount > 0 && (
-                <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                  {unreadCount} new
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1">
-              {unreadCount > 0 && (
-                <button
-                  onClick={handleMarkAllAsRead}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-blue-100 transition-colors"
-                  title="Mark all as read"
-                >
-                  <CheckCheck size={14} />
-                  Read all
-                </button>
-              )}
-              <button
-                onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          </div>
-
-          {/* Notification List */}
-          <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
-            {loading && notifications.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-slate-400">
-                <svg className="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span className="text-sm">Loading...</span>
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-slate-400">
-                <Bell size={32} className="mb-2 opacity-30" />
-                <p className="text-sm font-medium">No notifications yet</p>
-                <p className="text-xs text-slate-400 mt-1">You're all caught up!</p>
-              </div>
-            ) : (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`px-4 py-3 border-b border-slate-100 last:border-b-0 transition-colors hover:bg-slate-50 cursor-pointer ${
-                    !notification.isRead ? 'bg-blue-50/50' : ''
-                  }`}
-                  onClick={() => {
-                    if (!notification.isRead) handleMarkAsRead(notification.id);
-                  }}
-                >
-                  <div className="flex items-start gap-3">
-                    {/* Type Icon */}
-                    <div className={`mt-0.5 p-1.5 rounded-lg ${
-                      !notification.isRead ? 'bg-blue-100' : 'bg-slate-100'
-                    }`}>
-                      {getTypeIcon(notification.type)}
-                    </div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${getTypeBadgeColor(notification.type)}`}>
-                          {notification.type}
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          {formatTime(notification.createdAt)}
-                        </span>
-                      </div>
-                      <p className={`text-xs leading-relaxed ${
-                        !notification.isRead ? 'text-slate-800 font-medium' : 'text-slate-600'
-                      }`}>
-                        {notification.message}
-                      </p>
-                    </div>
-
-                    {/* Read Indicator */}
-                    <div className="flex-shrink-0 mt-1">
-                      {!notification.isRead ? (
-                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" title="Unread"></div>
-                      ) : (
-                        <Check size={14} className="text-slate-300" />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))
+      <div 
+        className={`absolute right-0 mt-3 w-96 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-slate-200 z-50 overflow-hidden transition-all duration-300 ease-out origin-top-right ${
+          isOpen ? 'opacity-100 transform scale-100 translate-y-0 visible' : 'opacity-0 transform scale-95 -translate-y-4 invisible pointer-events-none'
+        }`}
+      >
+        {/* Header */}
+        <div className="px-4 py-3 bg-gradient-to-r from-slate-50/80 to-blue-50/80 border-b border-slate-200 flex items-center justify-between backdrop-blur-md">
+          <div className="flex items-center gap-2">
+            <Bell size={16} className="text-blue-600" />
+            <h3 className="text-sm font-bold text-slate-800">Notifications</h3>
+            {unreadCount > 0 && (
+              <span className="bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                {unreadCount} new
+              </span>
             )}
           </div>
+          <div className="flex items-center gap-1">
+            {notifications.length > 0 && (
+              <button
+                onClick={handleMarkAllAsRead}
+                disabled={unreadCount === 0}
+                className={`text-xs font-medium flex items-center gap-1 px-2 py-1 rounded-lg transition-colors ${
+                  unreadCount === 0 
+                    ? 'text-slate-400 cursor-default opacity-60' 
+                    : 'text-blue-600 hover:text-blue-800 hover:bg-blue-100'
+                }`}
+                title="Mark all as read"
+              >
+                <CheckCheck size={14} />
+                Mark all read
+              </button>
+            )}
+            {notifications.length > 0 && (
+              <button
+                onClick={handleClearAll}
+                className="text-xs text-red-500 hover:text-red-700 font-medium flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-red-50 transition-colors"
+                title="Clear all notifications"
+              >
+                <Trash2 size={13} />
+                Clear all
+              </button>
+            )}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors ml-1"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        </div>
 
-          {/* Footer */}
-          {notifications.length > 0 && (
-            <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-center">
-              <p className="text-[10px] text-slate-400">
-                Showing {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
-              </p>
+        {/* Notification List */}
+        <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+          {loading && notifications.length === 0 ? (
+            <div className="flex items-center justify-center py-12 text-slate-400">
+              <svg className="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span className="text-sm">Loading...</span>
             </div>
+          ) : notifications.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-slate-400">
+              <Bell size={32} className="mb-2 opacity-30" />
+              <p className="text-sm font-medium">No notifications yet</p>
+              <p className="text-xs text-slate-400 mt-1">You're all caught up!</p>
+            </div>
+          ) : (
+            notifications.map((notification) => (
+              <div
+                key={notification.id}
+                className={`px-4 py-3 border-b border-slate-100 last:border-b-0 transition-colors hover:bg-slate-50 cursor-pointer ${
+                  !notification.isRead ? 'bg-blue-50/40' : ''
+                }`}
+                onClick={() => {
+                  if (!notification.isRead) handleMarkAsRead(notification.id);
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Type Icon */}
+                  <div className={`mt-0.5 p-1.5 rounded-lg ${
+                    !notification.isRead ? 'bg-blue-100' : 'bg-slate-100'
+                  }`}>
+                    {getTypeIcon(notification.type)}
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider ${getTypeBadgeColor(notification.type)}`}>
+                        {notification.type}
+                      </span>
+                      <span className="text-[10px] text-slate-400">
+                        {formatTime(notification.createdAt)}
+                      </span>
+                    </div>
+                    <p className={`text-xs leading-relaxed ${
+                      !notification.isRead ? 'text-slate-800 font-medium' : 'text-slate-600'
+                    }`}>
+                      {notification.message}
+                    </p>
+                  </div>
+
+                  {/* Read Indicator & Delete Action */}
+                  <div className="flex-shrink-0 mt-1 flex flex-col items-center gap-2">
+                    {!notification.isRead ? (
+                       <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" title="Unread"></div>
+                    ) : (
+                       <Check size={14} className="text-slate-300" title="Read" />
+                    )}
+                    
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteNotification(notification.id, notification.isRead);
+                      }}
+                      className="text-slate-300 hover:text-red-500 transition-colors p-1 rounded hover:bg-red-50"
+                      title="Delete notification"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
-      )}
+
+        {/* Footer */}
+        {notifications.length > 0 && (
+          <div className="px-4 py-2 bg-slate-50/80 backdrop-blur-md border-t border-slate-200 text-center">
+            <p className="text-[10px] text-slate-400">
+              Showing {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

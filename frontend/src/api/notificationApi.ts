@@ -36,3 +36,17 @@ export const markAsRead = (id: number) => {
 export const markAllAsRead = () => {
   return api.patch<{ message: string }>('/notifications/read-all');
 };
+
+/**
+ * Delete a single notification.
+ */
+export const deleteNotification = (id: number) => {
+  return api.delete<{ message: string }>(`/notifications/${id}`);
+};
+
+/**
+ * Delete all notifications for the user.
+ */
+export const clearAllNotifications = () => {
+  return api.delete<{ message: string }>('/notifications/all');
+};

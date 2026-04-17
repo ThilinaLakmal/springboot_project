@@ -108,4 +108,25 @@ public class NotificationServiceImpl implements NotificationService {
                 .createdAt(notification.getCreatedAt())
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void deleteNotification(Long notificationId, Long currentUserId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: " + notificationId));
+
+        if (!notification.getUser().getId().equals(currentUserId)) {
+            throw new RuntimeException("Unauthorized: You cannot delete this notification");
+        }
+
+        notificationRepository.delete(notification);
+        log.info("Notification {} deleted by user {}", notificationId, currentUserId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllUserNotifications(Long userId) {
+        int deleted = notificationRepository.deleteAllByUserId(userId);
+        log.info("Deleted {} notifications for user {}", deleted, userId);
+    }
 }

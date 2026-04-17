@@ -46,4 +46,15 @@ public interface NotificationService {
      * @param type    the notification type (BOOKING, TICKET, SYSTEM)
      */
     void notifyAllAdmins(String message, NotificationType type);
+
+    /**
+     * Delete a single notification.
+     * Ensures that the notification belongs to the authenticated user.
+     */
+    void deleteNotification(Long notificationId, Long currentUserId);
+
+    /**
+     * Delete all notifications for a specific user.
+     */
+    void deleteAllUserNotifications(Long userId);
 }
