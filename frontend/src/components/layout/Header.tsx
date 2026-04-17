@@ -10,9 +10,11 @@ export const Header: React.FC = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();
-    toast.success('Successfully logged out');
-    navigate('/login');
+    if (window.confirm("Are you sure you want to log out of the system?")) {
+      logout();
+      toast.success('Successfully logged out');
+      navigate('/login');
+    }
   };
 
   return (
@@ -46,10 +48,9 @@ export const Header: React.FC = () => {
 
           <button 
             onClick={handleLogout}
-            className="ml-2 text-slate-400 hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-red-50"
-            title="Logout"
+            className="ml-2 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-all py-1.5 px-4 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500/50"
           >
-            <LogOut size={18} />
+            Logout
           </button>
         </div>
       </div>
