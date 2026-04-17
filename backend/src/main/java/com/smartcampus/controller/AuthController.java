@@ -7,8 +7,10 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.smartcampus.dto.AuthResponse;
 import com.smartcampus.dto.GoogleLoginRequest;
 import com.smartcampus.model.entity.User;
+import com.smartcampus.model.enums.NotificationType;
 import com.smartcampus.repository.UserRepository;
 import com.smartcampus.security.JwtService;
+import com.smartcampus.service.NotificationService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,14 +28,17 @@ public class AuthController {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final NotificationService notificationService;
     private final GoogleIdTokenVerifier verifier;
 
     public AuthController(
             UserRepository userRepository,
             JwtService jwtService,
+            NotificationService notificationService,
             @Value("${app.google.client-id}") String googleClientId) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
+        this.notificationService = notificationService;
         this.verifier = new GoogleIdTokenVerifier.Builder(
                 new NetHttpTransport(), GsonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(googleClientId))
@@ -82,6 +87,16 @@ public class AuthController {
                         .build();
                 user = userRepository.save(user);
                 log.info("New user auto-registered with ID: {} and role: STUDENT", user.getId());
+
+                // Notify all admins about the new registration
+                try {
+                    notificationService.notifyAllAdmins(
+                            "New user registered: " + user.getUsername() + " (" + user.getEmail() + ")",
+                            NotificationType.SYSTEM
+                    );
+                } catch (Exception e) {
+                    log.warn("Failed to send new user registration notification to admins: {}", e.getMessage());
+                }
             } else {
                 // Update Google-specific fields if they changed
                 boolean updated = false;

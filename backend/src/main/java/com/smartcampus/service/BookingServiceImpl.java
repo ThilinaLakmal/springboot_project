@@ -130,6 +130,17 @@ public class BookingServiceImpl implements BookingService {
             log.warn("Failed to send booking creation notification: {}", e.getMessage());
         }
 
+        // Notify all admins about the new booking request
+        try {
+            notificationService.notifyAllAdmins(
+                    "New booking request: " + user.getUsername() + " requested '" + resource.getName()
+                            + "' for " + dto.getBookingDate() + " (" + dto.getStartTime() + " - " + dto.getEndTime() + ")",
+                    NotificationType.BOOKING
+            );
+        } catch (Exception e) {
+            log.warn("Failed to send booking creation notification to admins: {}", e.getMessage());
+        }
+
         return mapToDto(booking);
     }
 
@@ -211,6 +222,19 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(BookingStatus.CANCELLED);
         booking = bookingRepository.save(booking);
         log.info("Booking ID: {} cancelled successfully", id);
+
+        // Notify all admins about the cancellation
+        try {
+            notificationService.notifyAllAdmins(
+                    "Booking cancelled: " + booking.getUser().getUsername()
+                            + " cancelled their booking for '" + booking.getResource().getName()
+                            + "' on " + booking.getBookingDate(),
+                    NotificationType.BOOKING
+            );
+        } catch (Exception e) {
+            log.warn("Failed to send booking cancellation notification to admins: {}", e.getMessage());
+        }
+
         return mapToDto(booking);
     }
 
@@ -263,11 +287,27 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public void deleteBooking(Long id) {
-        if (!bookingRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Booking not found with ID: " + id);
-        }
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with ID: " + id));
+
+        // Capture details before deletion for the admin notification
+        String userName = booking.getUser().getUsername();
+        String resourceName = booking.getResource().getName();
+        String bookingDate = booking.getBookingDate() != null ? booking.getBookingDate().toString() : "N/A";
+
         bookingRepository.deleteById(id);
         log.info("Booking ID: {} deleted permanently", id);
+
+        // Notify all admins about the cancellation
+        try {
+            notificationService.notifyAllAdmins(
+                    "Booking cancelled: " + userName + " cancelled their request for '" + resourceName
+                            + "' on " + bookingDate,
+                    NotificationType.BOOKING
+            );
+        } catch (Exception e) {
+            log.warn("Failed to send booking deletion notification to admins: {}", e.getMessage());
+        }
     }
 
     private BookingDto mapToDto(Booking booking) {

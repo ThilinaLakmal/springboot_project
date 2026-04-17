@@ -73,6 +73,31 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Marked {} notifications as read for user {}", updated, userId);
     }
 
+    @Override
+    @Transactional
+    public void notifyAllAdmins(String message, NotificationType type) {
+        List<User> admins = userRepository.findByRole("ADMIN");
+        if (admins.isEmpty()) {
+            log.warn("No admin users found to notify. Message: [{}] {}", type, message);
+            return;
+        }
+
+        log.info("Sending notification to {} admin(s): [{}] {}", admins.size(), type, message);
+        for (User admin : admins) {
+            try {
+                Notification notification = Notification.builder()
+                        .user(admin)
+                        .message(message)
+                        .type(type)
+                        .isRead(false)
+                        .build();
+                notificationRepository.save(notification);
+            } catch (Exception e) {
+                log.error("Failed to create notification for admin userId={}: {}", admin.getId(), e.getMessage());
+            }
+        }
+    }
+
     private NotificationDto mapToDto(Notification notification) {
         return NotificationDto.builder()
                 .id(notification.getId())

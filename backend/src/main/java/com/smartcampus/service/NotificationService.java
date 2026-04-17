@@ -37,4 +37,13 @@ public interface NotificationService {
      * Mark all notifications for a user as read.
      */
     void markAllAsRead(Long userId);
+
+    /**
+     * Send a notification to ALL admin users.
+     * Used to alert admins of significant system events like new registrations or booking requests.
+     *
+     * @param message the notification message
+     * @param type    the notification type (BOOKING, TICKET, SYSTEM)
+     */
+    void notifyAllAdmins(String message, NotificationType type);
 }
