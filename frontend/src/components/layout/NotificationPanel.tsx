@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, X, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, X, Trash2, ArrowRight } from 'lucide-react';
 import { getNotifications, getUnreadCount, markAsRead, markAllAsRead, deleteNotification, clearAllNotifications, NotificationData } from '../../api/notificationApi';
 import { useAuth } from '../../contexts/AuthContext';
 
 export const NotificationPanel: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -241,6 +243,8 @@ export const NotificationPanel: React.FC = () => {
                 }`}
                 onClick={() => {
                   if (!notification.isRead) handleMarkAsRead(notification.id);
+                  setIsOpen(false);
+                  navigate('/app/notifications');
                 }}
               >
                 <div className="flex items-start gap-3">
@@ -273,7 +277,9 @@ export const NotificationPanel: React.FC = () => {
                     {!notification.isRead ? (
                        <div className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-pulse" title="Unread"></div>
                     ) : (
-                       <Check size={14} className="text-slate-300" title="Read" />
+                       <span title="Read" className="flex items-center justify-center">
+                         <Check size={14} className="text-slate-300" />
+                       </span>
                     )}
                     
                     <button
@@ -295,10 +301,13 @@ export const NotificationPanel: React.FC = () => {
 
         {/* Footer */}
         {notifications.length > 0 && (
-          <div className="px-4 py-2 bg-slate-50/80 backdrop-blur-md border-t border-slate-200 text-center">
-            <p className="text-[10px] text-slate-400">
-              Showing {notifications.length} notification{notifications.length !== 1 ? 's' : ''}
-            </p>
+          <div className="px-4 py-3 bg-slate-50/100 backdrop-blur-md border-t border-slate-200 text-center">
+            <button
+               onClick={() => { setIsOpen(false); navigate('/app/notifications'); }}
+               className="text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors flex items-center justify-center gap-1 w-full"
+            >
+               View all notifications <ArrowRight size={14} />
+            </button>
           </div>
         )}
       </div>

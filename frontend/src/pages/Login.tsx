@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth, User } from '../contexts/AuthContext';
-import { Building2, ArrowRight, ShieldCheck, Sparkles, Mail, Lock } from 'lucide-react';
+import { Building2, ShieldCheck, Sparkles, Mail, Lock } from 'lucide-react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { googleLogin, login as manualLogin } from '../api/authApi';
 import toast from 'react-hot-toast';

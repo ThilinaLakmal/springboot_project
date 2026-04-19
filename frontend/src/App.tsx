@@ -10,6 +10,7 @@ import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Profile } from './pages/Profile';
 import { UserManagement } from './pages/UserManagement';
+import { Notifications } from './pages/Notifications';
 
 // Actual facilities pages imports
 import { Dashboard } from './pages/facilities/Dashboard';
@@ -77,6 +78,9 @@ const App: React.FC = () => {
                 <Route path="users" element={<ProtectedRoute requiredRole="ADMIN" />}>
                   <Route index element={<UserManagement />} />
                 </Route>
+
+                {/* Notifications */}
+                <Route path="notifications" element={<Notifications />} />
 
                 {/* Other modules placeholders */}
               </Route>

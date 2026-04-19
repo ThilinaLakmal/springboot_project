@@ -1,5 +1,5 @@
 import React from 'react';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { User as UserIcon } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { NotificationPanel } from './NotificationPanel';
