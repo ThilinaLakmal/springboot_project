@@ -4,6 +4,7 @@ import { Resource } from '../../types/resource';
 import { Search, MapPin, Users, Clock, CheckCircle2, AlertCircle, Wrench, ChevronRight, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
+import { Footer } from '../../components/layout/Footer';
 
 export const ResourceFeed: React.FC = () => {
   const [resources, setResources] = useState<Resource[]>([]);
@@ -75,7 +76,7 @@ export const ResourceFeed: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 flex flex-col">
       {/* Standalone Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 md:px-8 h-16 flex items-center justify-between">
@@ -92,7 +93,7 @@ export const ResourceFeed: React.FC = () => {
         </div>
       </header>
 
-      <div className="p-4 md:p-8 max-w-7xl mx-auto animate-fade-in-up">
+      <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto animate-fade-in-up w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-6">
         <div>
           <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tight">Campus Feed</h1>
@@ -240,6 +241,7 @@ export const ResourceFeed: React.FC = () => {
          </div>
       )}
       </div>
+      <Footer />
     </div>
   );
 };
