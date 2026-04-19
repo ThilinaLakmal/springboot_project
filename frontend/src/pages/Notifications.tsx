@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, Trash2, ArrowLeft } from 'lucide-react';
+import { Bell, Check, CheckCheck, BookOpen, Ticket, Info, Trash2, ArrowLeft, RotateCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { 
   getNotifications, 
@@ -14,19 +14,19 @@ import toast from 'react-hot-toast';
 
 const getTypeIcon = (type: string) => {
   switch (type) {
-    case 'BOOKING': return <BookOpen size={18} className="text-blue-500" />;
-    case 'TICKET': return <Ticket size={18} className="text-amber-500" />;
-    case 'SYSTEM': return <Info size={18} className="text-slate-500" />;
-    default: return <Info size={18} className="text-slate-400" />;
+    case 'BOOKING': return <BookOpen size={20} className="text-blue-500" />;
+    case 'TICKET': return <Ticket size={20} className="text-amber-500" />;
+    case 'SYSTEM': return <Info size={20} className="text-slate-500" />;
+    default: return <Info size={20} className="text-slate-400" />;
   }
 };
 
 const getTypeBadgeColor = (type: string) => {
   switch (type) {
-    case 'BOOKING': return 'bg-blue-100 text-blue-700';
-    case 'TICKET': return 'bg-amber-100 text-amber-700';
-    case 'SYSTEM': return 'bg-slate-100 text-slate-700';
-    default: return 'bg-slate-100 text-slate-500';
+    case 'BOOKING': return 'bg-blue-100 text-blue-700 border-blue-200';
+    case 'TICKET': return 'bg-amber-100 text-amber-700 border-amber-200';
+    case 'SYSTEM': return 'bg-slate-100 text-slate-700 border-slate-200';
+    default: return 'bg-slate-100 text-slate-500 border-slate-200';
   }
 };
 
@@ -104,7 +104,7 @@ export const Notifications: React.FC = () => {
   };
 
   const handleClearAll = async () => {
-    if (!window.confirm("Are you sure you want to delete all notifications?")) return;
+    if (!window.confirm("Are you sure you want to wipe all notifications?")) return;
     
     try {
       await clearAllNotifications();
@@ -119,124 +119,137 @@ export const Notifications: React.FC = () => {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="p-6 md:p-8 max-w-5xl mx-auto space-y-6 animate-fade-in-up flex-1">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
+    <div className="w-full max-w-5xl mx-auto space-y-8 animate-fade-in-up relative z-10 flex-1 px-4 sm:px-0">
+      {/* Page Header Area */}
+      <div className="bg-white/60 backdrop-blur-3xl rounded-[2rem] p-6 shadow-xl shadow-slate-200/40 border border-white flex flex-col md:flex-row justify-between items-center gap-6 mt-4 relative overflow-hidden">
+        
+        {/* Deep orb effect inside header */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-400/10 rounded-full blur-3xl pointer-events-none -translate-y-1/2 translate-x-1/3"></div>
+
+        <div className="relative z-10 flex flex-col w-full md:w-auto">
           <button 
             onClick={() => navigate(-1)} 
-            className="flex items-center text-slate-500 hover:text-blue-600 transition-colors mb-2 gap-1 text-sm font-medium"
+            className="flex items-center text-slate-400 hover:text-blue-600 transition-colors mb-4 gap-1.5 text-xs font-bold uppercase tracking-widest w-fit"
           >
-            <ArrowLeft size={16} />
-            Back
+            <ArrowLeft size={14} /> Go Back
           </button>
-          <div className="flex items-center gap-3">
-             <div className="p-2.5 bg-blue-100 text-blue-600 rounded-xl shadow-sm">
-                <Bell size={24} />
+          <div className="flex items-center gap-4">
+             <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-[0_10px_25px_-5px_rgba(37,99,235,0.4)]">
+                <Bell size={28} />
              </div>
              <div>
-                <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Notifications</h1>
-                <p className="text-sm text-slate-500 mt-0.5">Stay updated with your campus activities.</p>
+                <h1 className="text-3xl font-black text-slate-800 tracking-tight flex items-center gap-3">
+                  Notifications
+                  {unreadCount > 0 && (
+                    <span className="bg-red-500 text-white text-[11px] font-black px-2 py-0.5 rounded-md shadow-lg shadow-red-500/30 animate-pulse">
+                      {unreadCount} NEW
+                    </span>
+                  )}
+                </h1>
+                <p className="text-sm text-slate-500 font-medium tracking-wide mt-1">Review your recent alerts and system updates.</p>
              </div>
           </div>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+        <div className="flex flex-row items-center gap-3 w-full md:w-auto relative z-10">
           {notifications.length > 0 && (
              <button
                 onClick={handleMarkAllAsRead}
                 disabled={unreadCount === 0}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+                className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
                    unreadCount === 0 
-                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                     : 'bg-white border text-slate-700 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 border-slate-200'
+                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed opacity-50'
+                     : 'bg-white shadow-lg text-slate-700 hover:text-blue-600 border border-slate-100 hover:border-blue-200 hover:-translate-y-1'
                 }`}
              >
-                <CheckCheck size={16} />
-                Mark all read
+                <CheckCheck size={16} /> Mark all read
              </button>
           )}
           {notifications.length > 0 && (
              <button
                 onClick={handleClearAll}
-                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all shadow-sm"
+                className="flex-[0.5] md:flex-none flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest bg-red-50 text-red-600 hover:bg-red-100 transition-all hover:-translate-y-1 shadow-sm"
+                title="Wipe all notifications"
              >
-                <Trash2 size={16} />
-                Clear all
+                <Trash2 size={16} /> <span className="hidden sm:inline">Wipe</span>
              </button>
           )}
         </div>
       </div>
 
-      {/* Main Content Card */}
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-slate-100 overflow-hidden min-h-[400px]">
+      {/* Main Content Area */}
+      <div className="min-h-[400px]">
          {loading ? (
-           <div className="flex flex-col items-center justify-center h-[400px] text-slate-400">
-             <div className="animate-spin h-8 w-8 border-4 border-slate-200 border-t-blue-600 rounded-full mb-4"></div>
-             <p className="text-sm font-medium">Loading notifications...</p>
+           <div className="flex flex-col items-center justify-center h-[400px] text-blue-500">
+             <div className="animate-spin h-10 w-10 border-[3px] border-slate-200 border-t-current rounded-full mb-4"></div>
+             <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">Loading Feed...</p>
            </div>
          ) : notifications.length === 0 ? (
-           <div className="flex flex-col items-center justify-center h-[400px] text-slate-400">
-             <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                <Bell size={40} className="text-slate-300" />
+           <div className="bg-white/60 backdrop-blur-xl rounded-[2.5rem] p-16 text-center shadow-[0_10px_40px_-10px_rgba(0,0,0,0.05)] border border-slate-100/50 flex flex-col items-center justify-center h-[400px]">
+             <div className="w-24 h-24 bg-blue-50 rounded-[2rem] flex items-center justify-center mb-6 text-blue-400 shadow-[inset_0_0_20px_rgba(0,0,0,0.02)]">
+                <Bell size={48} />
              </div>
-             <h3 className="text-lg font-bold text-slate-700 mb-1">No notifications yet</h3>
-             <p className="text-sm text-slate-500">When you interact with the campus operations, your alerts will show here.</p>
+             <h3 className="text-3xl font-black text-slate-800 mb-3 tracking-tight">You're Empty!</h3>
+             <p className="text-slate-500 font-medium text-lg">You have no new alerts. Enjoy the silence.</p>
            </div>
          ) : (
-           <div className="divide-y divide-slate-100">
+           <div className="space-y-4">
               {notifications.map((notification) => (
                  <div
                    key={notification.id}
-                   className={`p-5 sm:p-6 transition-all hover:bg-slate-50 group flex flex-col sm:flex-row gap-4 sm:items-start ${
-                      !notification.isRead ? 'bg-blue-50/30' : ''
+                   className={`relative overflow-hidden p-6 rounded-[2rem] border transition-all duration-[400ms] group flex flex-col sm:flex-row gap-5 items-start sm:items-center will-change-transform ${
+                      !notification.isRead 
+                        ? 'bg-white shadow-[0_10px_30px_-5px_rgba(59,130,246,0.15)] border-blue-100 hover:shadow-[0_20px_40px_-5px_rgba(59,130,246,0.25)] hover:-translate-y-1.5' 
+                        : 'bg-white/70 backdrop-blur-md border-white/50 shadow-sm hover:shadow-[0_10px_30px_-5px_rgba(0,0,0,0.08)] hover:bg-white hover:-translate-y-1 opacity-90 hover:opacity-100'
                    }`}
                  >
-                    {/* Icon */}
-                    <div className="flex-shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-white shadow-sm border border-slate-100">
+                    {/* Read Indicator Line (Left Edge Accent) */}
+                    {!notification.isRead && (
+                       <div className="absolute left-0 top-6 bottom-6 w-1.5 bg-blue-500 rounded-r-lg shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+                    )}
+
+                    {/* Icon Bubble */}
+                    <div className={`flex-shrink-0 flex items-center justify-center w-14 h-14 rounded-[1.25rem] shadow-inner ${
+                       !notification.isRead ? 'bg-blue-50' : 'bg-slate-50'
+                    }`}>
                        {getTypeIcon(notification.type)}
                     </div>
 
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                       <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                          <span className={`text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-md uppercase tracking-wider ${getTypeBadgeColor(notification.type)}`}>
+                    {/* Content Body */}
+                    <div className="flex-1 min-w-0 pr-0 sm:pr-8">
+                       <div className="flex flex-wrap items-center gap-3 mb-2.5">
+                          <span className={`text-[10px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border ${getTypeBadgeColor(notification.type)}`}>
                              {notification.type}
                           </span>
-                          <span className="text-xs text-slate-400 font-medium whitespace-nowrap">
-                             {formatTime(notification.createdAt)}
+                          <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                             <RotateCcw size={13} className="opacity-60" /> {formatTime(notification.createdAt)}
                           </span>
                        </div>
-                       <p className={`text-sm sm:text-base leading-relaxed ${
-                          !notification.isRead ? 'text-slate-800 font-semibold' : 'text-slate-600'
+                       <p className={`text-[15px] leading-relaxed ${
+                          !notification.isRead ? 'text-slate-800 font-extrabold' : 'text-slate-600 font-semibold'
                        }`}>
                           {notification.message}
                        </p>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex sm:flex-col items-center justify-end gap-3 sm:pl-4 sm:border-l border-slate-100 mt-2 sm:mt-0 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                       {!notification.isRead ? (
+                    {/* Action Buttons (Slide in on Hover for md+) */}
+                    <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto mt-4 sm:mt-0 sm:opacity-0 sm:translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+                       {!notification.isRead && (
                           <button
                              onClick={() => handleMarkAsRead(notification.id)}
-                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
+                             title="Mark as Read"
+                             className="flex items-center justify-center p-3 rounded-xl bg-slate-50 border border-slate-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5"
                           >
-                             <Check size={14} />
-                             Mark Read
+                             <Check size={18} className="stroke-[3]" />
                           </button>
-                       ) : (
-                          <span title="Read" className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 rounded-lg">
-                            <CheckCheck size={14} />
-                            Read
-                          </span>
                        )}
                        
                        <button
                           onClick={() => handleDeleteNotification(notification.id)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
+                          title="Delete Alert"
+                          className="flex items-center justify-center p-3 rounded-xl bg-slate-50 border border-slate-100 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm hover:shadow-lg hover:shadow-red-500/30 hover:-translate-y-0.5"
                        >
-                          <Trash2 size={14} />
-                          Delete
+                          <Trash2 size={18} />
                        </button>
                     </div>
                  </div>
