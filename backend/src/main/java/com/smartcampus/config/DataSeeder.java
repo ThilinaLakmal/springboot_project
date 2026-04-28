@@ -17,28 +17,16 @@ public class DataSeeder {
     @Bean
     public CommandLineRunner initData(UserRepository userRepository) {
         return args -> {
-            if (userRepository.findByEmail("admin@smartcampus.edu").isEmpty()) {
+            if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
                 User admin = User.builder()
                         .username("admin")
-                        .password(passwordEncoder.encode("admin"))
-                        .email("admin@smartcampus.edu")
+                        .password(passwordEncoder.encode("admin@123"))
+                        .email("admin@gmail.com")
                         .role("ADMIN")
                         .isActive(true)
                         .isEmailVerified(true)
                         .build();
                 userRepository.save(admin);
-            }
-
-            if (userRepository.findByEmail("student@smartcampus.edu").isEmpty()) {
-                User student = User.builder()
-                        .username("student")
-                        .password(passwordEncoder.encode("student"))
-                        .email("student@smartcampus.edu")
-                        .role("STUDENT")
-                        .isActive(true)
-                        .isEmailVerified(true)
-                        .build();
-                userRepository.save(student);
             }
         };
     }
